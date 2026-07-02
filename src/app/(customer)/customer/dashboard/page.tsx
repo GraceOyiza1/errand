@@ -136,16 +136,16 @@ export default function CustomerDashboard() {
             notes: item.notes || '',
             isCustom: item.isCustom || false
         })));
-        
+
         const savedOrders = window.localStorage.getItem('errand-demo-orders');
         if (savedOrders) {
             try {
                 let parsed = JSON.parse(savedOrders);
                 parsed = parsed.map((o: any) => o.id === confirmedOrder.id ? { ...o, status: 'cancelled' } : o);
                 window.localStorage.setItem('errand-demo-orders', JSON.stringify(parsed));
-            } catch (e) {}
+            } catch (e) { }
         }
-        
+
         setConfirmedOrder(null);
         window.sessionStorage.removeItem('currentErrandOrderId');
         setCheckoutMessage('Order reopened for editing. Make your changes and check out again.');
@@ -229,7 +229,7 @@ export default function CustomerDashboard() {
         const orderItems = items.map((item) => ({
             ...item
         }));
-        
+
         // eslint-disable-next-line react-hooks/purity
         const generatedId = `demo-${Date.now()}`;
 
@@ -282,12 +282,25 @@ export default function CustomerDashboard() {
     return (
         <div className="space-y-8 max-w-5xl mx-auto transition-all duration-300">
             {step === 0 && (
-                <div className="space-y-6 max-w-md mx-auto mt-10">
-                    <div className="text-center">
-                        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Welcome to Errand</h1>
-                        <p className="text-slate-500 mt-2">Please enter your details to get started.</p>
+                <div className="space-y-6 w-full mt-10">
+                    <div className="text-center max-w-3xl mx-auto px-4">
+                        <h1 className="font-extrabold tracking-tight text-slate-900 text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight">Welcome to Errand</h1>
+                        <p className="text-slate-500 mt-3 text-sm sm:text-base md:text-lg">Please enter your details to get started.</p>
+
+                        {/* Image placeholders for hero (replace with real images later) */}
+                        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+                            <div className="h-28 sm:h-32 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400">
+                                <span className="text-xs">Image Placeholder 1</span>
+                            </div>
+                            <div className="h-28 sm:h-32 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400">
+                                <span className="text-xs">Image Placeholder 2</span>
+                            </div>
+                            <div className="h-28 sm:h-32 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400">
+                                <span className="text-xs">Image Placeholder 3</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 max-w-md mx-auto">
                         <div>
                             <label className="block text-xs font-semibold text-slate-600 mb-1">Your Name</label>
                             <input
