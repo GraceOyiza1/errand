@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import ImageUploader from "@/components/ImageUploader";
 
 interface Market {
   id: string;
@@ -24,6 +25,7 @@ interface ShoppingItem {
   quantity: number;
   unit: string;
   notes: string;
+  imageUrls: string[];
   isCustom: boolean;
 }
 
@@ -119,6 +121,7 @@ export default function CustomerDashboard() {
   const [quantity, setQuantity] = useState(1);
   const [customUnit, setCustomUnit] = useState("wrap/packet");
   const [notes, setNotes] = useState("");
+  const [itemImages, setItemImages] = useState<string[]>([]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -179,6 +182,7 @@ export default function CustomerDashboard() {
         quantity: item.quantity,
         unit: item.unit,
         notes: item.notes || "",
+        imageUrls: item.imageUrls || [],
         isCustom: item.isCustom || false,
       })),
     );
@@ -194,7 +198,7 @@ export default function CustomerDashboard() {
           "errand-demo-orders",
           JSON.stringify(parsed),
         );
-      } catch (e) {}
+      } catch (e) { }
     }
 
     setConfirmedOrder(null);
@@ -218,11 +222,13 @@ export default function CustomerDashboard() {
         quantity,
         unit: customUnit,
         notes: notes,
+        imageUrls: itemImages,
         isCustom: true,
       };
       setItems([...items, newItem]);
       setCustomItemName("");
       setNotes("");
+      setItemImages([]);
     } else {
       const catalogItem = MARKET_CATALOG.find(
         (item) => item.id === selectedCatalogItemId,
@@ -236,10 +242,12 @@ export default function CustomerDashboard() {
         quantity,
         unit: catalogItem.unit,
         notes: notes,
+        imageUrls: itemImages,
         isCustom: false,
       };
       setItems([...items, newItem]);
       setNotes("");
+      setItemImages([]);
     }
   };
 
@@ -271,14 +279,14 @@ export default function CustomerDashboard() {
       (order: { marketName: string; items: ShoppingItem[] }) =>
         order.marketName === selectedMarket.name &&
         JSON.stringify(order.items) ===
-          JSON.stringify(
-            items.map((item) => ({
-              name: item.name,
-              quantity: item.quantity,
-              unit: item.unit,
-              notes: item.notes,
-            })),
-          ),
+        JSON.stringify(
+          items.map((item) => ({
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            notes: item.notes,
+          })),
+        ),
     );
 
     if (duplicateOrder) {
@@ -358,17 +366,11 @@ export default function CustomerDashboard() {
               Please enter your details to get started.
             </p>
 
-            {/* Image placeholders for hero (replace with real images later) */}
+            {/* Food item examples */}
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
-              <div className="h-28 sm:h-32 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400">
-                <span className="text-xs">Image Placeholder 1</span>
-              </div>
-              <div className="h-28 sm:h-32 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400">
-                <span className="text-xs">Image Placeholder 2</span>
-              </div>
-              <div className="h-28 sm:h-32 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400">
-                <span className="text-xs">Image Placeholder 3</span>
-              </div>
+              <img src="/images/food1.webp" alt="Fresh produce" className="h-28 sm:h-32 rounded-2xl border border-slate-200 object-cover w-full" />
+              <img src="/images/food2.webp" alt="Market items" className="h-28 sm:h-32 rounded-2xl border border-slate-200 object-cover w-full" />
+              <img src="/images/food3.webp" alt="Quality goods" className="h-28 sm:h-32 rounded-2xl border border-slate-200 object-cover w-full" />
             </div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 max-w-md mx-auto">
@@ -435,11 +437,10 @@ export default function CustomerDashboard() {
               <div
                 key={market.id}
                 onClick={() => setSelectedMarket(market)}
-                className={`p-6 bg-white border rounded-2xl shadow-xs hover:shadow-md transition cursor-pointer ${
-                  selectedMarket?.id === market.id
-                    ? "ring-2 ring-emerald-600 border-transparent bg-emerald-50/10"
-                    : "border-slate-200"
-                }`}
+                className={`p-6 bg-white border rounded-2xl shadow-xs hover:shadow-md transition cursor-pointer ${selectedMarket?.id === market.id
+                  ? "ring-2 ring-emerald-600 border-transparent bg-emerald-50/10"
+                  : "border-slate-200"
+                  }`}
               >
                 <div className="flex justify-between items-start">
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600">
@@ -591,6 +592,13 @@ export default function CustomerDashboard() {
                   />
                 </div>
 
+                <ImageUploader
+                  images={itemImages}
+                  onChange={setItemImages}
+                  label="Item photos"
+                  maxImages={3}
+                />
+
                 <button
                   type="submit"
                   className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm py-2.5 rounded-xl transition cursor-pointer"
@@ -638,6 +646,18 @@ export default function CustomerDashboard() {
                             <p className="text-xs text-emerald-600 mt-1">
                               📌 {item.notes}
                             </p>
+                          )}
+                          {item.imageUrls.length > 0 && (
+                            <div className="mt-3 flex gap-2">
+                              {item.imageUrls.map((src, index) => (
+                                <img
+                                  key={`${item.id}-img-${index}`}
+                                  src={src}
+                                  alt={`Attached item ${index + 1}`}
+                                  className="h-10 w-10 rounded-lg object-cover border border-slate-200"
+                                />
+                              ))}
+                            </div>
                           )}
                         </div>
                         <div className="flex items-center gap-4">
