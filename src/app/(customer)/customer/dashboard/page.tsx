@@ -9,6 +9,7 @@ interface Market {
   description: string;
   tag: string;
   baseDeliveryFee: number;
+  imageUrl?: string;
 }
 
 interface CatalogItem {
@@ -37,6 +38,7 @@ const ACCRA_MARKETS: Market[] = [
       "Excellent for fresh farm produce, local grains, and everyday foodstuffs.",
     tag: "Fast Delivery",
     baseDeliveryFee: 25,
+    imageUrl: "/images/mkt1.jpg",
   },
   {
     id: "makola",
@@ -45,6 +47,7 @@ const ACCRA_MARKETS: Market[] = [
       "Best wholesale hub for imported items, dry goods, and household packaging.",
     tag: "Bulk Items",
     baseDeliveryFee: 35,
+    imageUrl: "/images/mkt2.jpg",
   },
   {
     id: "kaneshie",
@@ -53,6 +56,7 @@ const ACCRA_MARKETS: Market[] = [
       "Ideal for local roots, tubers, and authentic spices wrapped in multi-tier stalls.",
     tag: "Structured Shopping",
     baseDeliveryFee: 30,
+    imageUrl: "/images/mkt3.jpg",
   },
   {
     id: "agbogbloshie",
@@ -61,6 +65,7 @@ const ACCRA_MARKETS: Market[] = [
       "Accra’s primary food depot for bulk yams, fresh tomatoes, and wholesale vegetables.",
     tag: "Wholesale Depot",
     baseDeliveryFee: 40,
+    imageUrl: "/images/mkt4.jpg",
   },
 ];
 
@@ -77,8 +82,8 @@ const MARKET_CATALOG: CatalogItem[] = [
     estimatedPrice: 40.0,
     unit: "olonka",
   },
-  { id: "p3", name: "Bawku Onions", estimatedPrice: 35.0, unit: "olonka" },
-  { id: "p4", name: "Local White Rice", estimatedPrice: 32.0, unit: "olonka" },
+  { id: "p3", name: "Onions", estimatedPrice: 35.0, unit: "1 bucket" },
+  { id: "p4", name: "Local Rice", estimatedPrice: 32.0, unit: "bag" },
 ];
 
 export default function CustomerDashboard() {
@@ -355,27 +360,27 @@ export default function CustomerDashboard() {
   const grandTotal = itemsSubtotal + marketBuffer + deliveryFee;
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto transition-all duration-300">
+    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300">
       {step === 0 && (
-        <div className="space-y-6 w-full mt-10">
-          <div className="text-center max-w-3xl mx-auto px-4">
-            <h1 className="font-extrabold tracking-tight text-slate-900 text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight">
+        <div className="space-y-6 sm:space-y-8 w-full mt-6 sm:mt-10">
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="font-extrabold tracking-tight text-slate-900 text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight">
               Welcome to Errand
             </h1>
-            <p className="text-slate-500 mt-3 text-sm sm:text-base md:text-lg">
+            <p className="text-slate-500 mt-2 sm:mt-3 text-xs sm:text-sm md:text-base lg:text-lg">
               Please enter your details to get started.
             </p>
 
             {/* Food item examples */}
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
-              <img src="/images/food1.webp" alt="Fresh produce" className="h-28 sm:h-32 rounded-2xl border border-slate-200 object-cover w-full" />
-              <img src="/images/food2.webp" alt="Market items" className="h-28 sm:h-32 rounded-2xl border border-slate-200 object-cover w-full" />
-              <img src="/images/food3.webp" alt="Quality goods" className="h-28 sm:h-32 rounded-2xl border border-slate-200 object-cover w-full" />
+            <div className="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 items-start">
+              <img src="/images/mkt1.jpg" alt="Fresh produce" className="h-24 sm:h-28 md:h-32 rounded-2xl border border-slate-200 object-cover w-full" />
+              <img src="/images/mkt2.jpg" alt="Market items" className="h-24 sm:h-28 md:h-32 rounded-2xl border border-slate-200 object-cover w-full" />
+              <img src="/images/mkt3.jpg" alt="Quality goods" className="h-24 sm:h-28 md:h-32 rounded-2xl border border-slate-200 object-cover w-full" />
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 max-w-md mx-auto">
+          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 w-full sm:max-w-md mx-auto">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">
+              <label className="block text-xs sm:text-sm font-semibold text-slate-600 mb-2">
                 Your Name
               </label>
               <input
@@ -383,11 +388,11 @@ export default function CustomerDashboard() {
                 placeholder="e.g. Ama Ghana"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600"
+                className="w-full text-xs sm:text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">
+              <label className="block text-xs sm:text-sm font-semibold text-slate-600 mb-2">
                 Phone Number
               </label>
               <input
@@ -395,7 +400,7 @@ export default function CustomerDashboard() {
                 placeholder="e.g. 054 123 4567"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
-                className="w-full text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600"
+                className="w-full text-xs sm:text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600"
               />
             </div>
             <button
@@ -405,7 +410,7 @@ export default function CustomerDashboard() {
                 }
               }}
               disabled={!customerName.trim() || !customerPhone.trim()}
-              className="w-full bg-emerald-600 text-white font-semibold text-sm px-6 py-3 rounded-xl hover:bg-emerald-500 transition disabled:bg-slate-300 disabled:cursor-not-allowed"
+              className="w-full bg-emerald-600 text-white font-semibold text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl hover:bg-emerald-500 transition disabled:bg-slate-300 disabled:cursor-not-allowed"
             >
               Continue to Markets
             </button>
@@ -414,56 +419,65 @@ export default function CustomerDashboard() {
       )}
 
       {step === 1 && (
-        <div className="space-y-6">
-          <div className="flex justify-between items-end">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-0">
             <div>
-              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">
                 Request a New Errand
               </h1>
-              <p className="text-slate-500 mt-2">
+              <p className="text-slate-500 mt-1 sm:mt-2 text-sm sm:text-base">
                 Select the market where our shopper should buy your commodities.
               </p>
             </div>
             <button
               onClick={() => setStep(0)}
-              className="text-xs font-medium text-slate-500 hover:text-emerald-600 cursor-pointer"
+              className="text-xs sm:text-sm font-medium text-slate-500 hover:text-emerald-600 cursor-pointer whitespace-nowrap"
             >
               Edit Profile
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-6">
             {ACCRA_MARKETS.map((market) => (
               <div
                 key={market.id}
                 onClick={() => setSelectedMarket(market)}
-                className={`p-6 bg-white border rounded-2xl shadow-xs hover:shadow-md transition cursor-pointer ${selectedMarket?.id === market.id
-                  ? "ring-2 ring-emerald-600 border-transparent bg-emerald-50/10"
+                className={`overflow-hidden bg-white border rounded-2xl shadow-xs hover:shadow-md transition cursor-pointer ${selectedMarket?.id === market.id
+                  ? "ring-2 ring-emerald-600 border-transparent"
                   : "border-slate-200"
                   }`}
               >
-                <div className="flex justify-between items-start">
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600">
-                    {market.tag}
-                  </span>
-                  <span className="text-sm font-bold text-emerald-600">
-                    ₵{market.baseDeliveryFee} delivery
-                  </span>
+                {market.imageUrl && (
+                  <img
+                    src={market.imageUrl}
+                    alt={market.name}
+                    className="w-full h-40 object-cover"
+                  />
+                )}
+                <div className="p-6">
+                  <div className="flex justify-between items-start">
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600">
+                      {market.tag}
+                    </span>
+                    <span className="text-sm font-bold text-emerald-600">
+                      ₵{market.baseDeliveryFee} delivery
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-xl text-slate-800 mt-3">
+                    {market.name}
+                  </h3>
                 </div>
-                <h3 className="font-bold text-xl text-slate-800 mt-3">
-                  {market.name}
-                </h3>
               </div>
             ))}
           </div>
 
           {selectedMarket && (
-            <div className="flex justify-end pt-4 border-t border-slate-200">
+            <div className="flex justify-end pt-3 sm:pt-4 border-t border-slate-200">
               <button
-                className="bg-emerald-600 text-white font-semibold text-sm px-6 py-3 rounded-xl hover:bg-emerald-500 transition cursor-pointer"
+                className="bg-emerald-600 text-white font-semibold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:bg-emerald-500 transition cursor-pointer"
                 onClick={() => setStep(2)}
               >
-                Continue to Shopping List ({selectedMarket.name})
+                Continue to Shopping List
               </button>
             </div>
           )}
@@ -471,8 +485,8 @@ export default function CustomerDashboard() {
       )}
 
       {step === 2 && selectedMarket && (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
             <div>
               <button
                 onClick={() => setStep(1)}
@@ -480,15 +494,15 @@ export default function CustomerDashboard() {
               >
                 ← Change Market
               </button>
-              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">
                 Create List for {selectedMarket.name}
               </h1>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {/* Input Form Box */}
-            <div className="bg-white border border-slate-200 p-6 rounded-2xl h-fit space-y-5 shadow-xs">
+            <div className="bg-white border border-slate-200 p-4 sm:p-6 rounded-2xl h-fit space-y-4 sm:space-y-5 shadow-xs">
               <div className="flex bg-slate-100 p-1 rounded-xl">
                 <button
                   type="button"
@@ -609,8 +623,8 @@ export default function CustomerDashboard() {
             </div>
 
             {/* Receipt Summary Box */}
-            <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-xs">
+            <div className="md:col-span-1 lg:col-span-2 space-y-4 sm:space-y-6">
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-xs order-last md:order-none">
                 <div className="bg-slate-50 px-6 py-3 border-b font-semibold text-xs text-slate-500 uppercase tracking-wider">
                   Current Errand Bucket
                 </div>
@@ -621,19 +635,19 @@ export default function CustomerDashboard() {
                     to test!
                   </div>
                 ) : (
-                  <div className="divide-y divide-slate-100 max-h-[300px] overflow-y-auto">
+                  <div className="divide-y divide-slate-100 max-h-[250px] sm:max-h-[350px] md:max-h-[400px] overflow-y-auto">
                     {items.map((item) => (
                       <div
                         key={item.id}
-                        className="p-4 flex justify-between items-center hover:bg-slate-50/20"
+                        className="p-3 sm:p-4 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 hover:bg-slate-50/20"
                       >
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-bold text-slate-800">
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="font-bold text-slate-800 text-sm sm:text-base">
                               {item.name}
                             </h4>
                             {item.isCustom && (
-                              <span className="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm font-bold">
+                              <span className="text-[9px] sm:text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm font-bold">
                                 Unlisted Request
                               </span>
                             )}
@@ -648,20 +662,20 @@ export default function CustomerDashboard() {
                             </p>
                           )}
                           {item.imageUrls.length > 0 && (
-                            <div className="mt-3 flex gap-2">
+                            <div className="mt-2 sm:mt-3 flex gap-2">
                               {item.imageUrls.map((src, index) => (
                                 <img
                                   key={`${item.id}-img-${index}`}
                                   src={src}
                                   alt={`Attached item ${index + 1}`}
-                                  className="h-10 w-10 rounded-lg object-cover border border-slate-200"
+                                  className="h-8 sm:h-10 w-8 sm:w-10 rounded-lg object-cover border border-slate-200"
                                 />
                               ))}
                             </div>
                           )}
                         </div>
-                        <div className="flex items-center gap-4">
-                          <span className="font-bold text-slate-900 text-sm">
+                        <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2 sm:gap-0">
+                          <span className="font-bold text-slate-900 text-xs sm:text-sm">
                             ₵{(item.targetPrice * item.quantity).toFixed(2)}
                           </span>
                           <button
@@ -679,40 +693,40 @@ export default function CustomerDashboard() {
               </div>
 
               {items.length > 0 && (
-                <div className="bg-slate-900 text-slate-100 p-6 rounded-2xl space-y-3 shadow-md">
+                <div className="bg-slate-900 text-slate-100 p-4 sm:p-6 rounded-2xl space-y-3 shadow-md">
                   <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 border-b border-slate-800 pb-2">
                     Pre-Authorization Summary
                   </h4>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-xs sm:text-sm">
                     <span className="text-slate-400">
                       Total Target Item Prices
                     </span>
                     <span>₵{itemsSubtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-xs sm:text-sm">
                     <span className="text-slate-400">
                       Dynamic Variable Pricing Buffer
                     </span>
                     <span>₵{marketBuffer.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-xs sm:text-sm">
                     <span className="text-slate-400">Rider Delivery Fee</span>
                     <span>₵{deliveryFee.toFixed(2)}</span>
                   </div>
                   <div className="border-t border-slate-800 my-2 pt-3 flex justify-between items-baseline">
-                    <span className="font-bold text-base">
+                    <span className="font-bold text-sm sm:text-base">
                       Total Escrow Hold
                     </span>
-                    <span className="text-2xl font-black text-emerald-400">
+                    <span className="text-xl sm:text-2xl font-black text-emerald-400">
                       ₵{grandTotal.toFixed(2)}
                     </span>
                   </div>
 
-                  <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 mt-4">
-                    <p className="text-[10px] uppercase tracking-widest text-slate-400">
+                  <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 mt-3 sm:mt-4">
+                    <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-400">
                       Payment Method
                     </p>
-                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                    <div className="mt-2 grid gap-2 grid-cols-1 sm:grid-cols-2">
                       <button
                         type="button"
                         onClick={() => {

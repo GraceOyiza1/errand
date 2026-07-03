@@ -1,6 +1,6 @@
 // src/app/page.tsx
 import Link from 'next/link';
-
+import image1 from '../../public/images/mkt1.jpg';
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-slate-50">
@@ -8,6 +8,7 @@ export default function HomePage() {
         <span className="text-xs font-bold tracking-widest text-emerald-600 uppercase bg-emerald-50 px-3 py-1 rounded-full">
           On-Demand Delivery
         </span>
+        <img src="/images/mkt1.jpg" alt="Quality goods" className="h-28 sm:h-32 rounded-2xl border border-slate-200 object-cover w-full" />
 
         <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl">
           Market Shopping Delivered

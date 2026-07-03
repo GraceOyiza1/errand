@@ -28,7 +28,7 @@ const DEFAULT_RIDERS = [
 
 export default function ShopperDashboard() {
     const [orders, setOrders] = useState<DemoOrder[]>([]);
-    const [riders, setRiders] = useState<{name: string, phone: string}[]>(DEFAULT_RIDERS);
+    const [riders, setRiders] = useState<{ name: string, phone: string }[]>(DEFAULT_RIDERS);
     const [selectedRider, setSelectedRider] = useState('');
     const [joinName, setJoinName] = useState('');
     const [joinPhone, setJoinPhone] = useState('');
@@ -60,7 +60,7 @@ export default function ShopperDashboard() {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setSelectedRider(DEFAULT_RIDERS[0].name);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const saveOrders = (updatedOrders: DemoOrder[]) => {
@@ -75,9 +75,9 @@ export default function ShopperDashboard() {
         if (!orderToAccept) return;
 
         const activeTasks = orders.filter(
-            o => o.riderName === selectedRider && 
-                 o.marketName === orderToAccept.marketName &&
-                 ['accepted', 'shopping', 'delivering'].includes(o.status)
+            o => o.riderName === selectedRider &&
+                o.marketName === orderToAccept.marketName &&
+                ['accepted', 'shopping', 'delivering'].includes(o.status)
         );
 
         if (activeTasks.length >= 2) {
@@ -124,7 +124,7 @@ export default function ShopperDashboard() {
             setRiders(nextRiders);
             window.localStorage.setItem('errand-demo-riders', JSON.stringify(nextRiders));
         }
-        
+
         setSelectedRider(trimmedName);
         setJoinName('');
         setJoinPhone('');
@@ -239,6 +239,13 @@ export default function ShopperDashboard() {
                                         className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
                                     >
                                         Accept Ride
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleCancelOrder(order.id)}
+                                        className="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500"
+                                    >
+                                        Cancel Order
                                     </button>
                                 </div>
                             ) : order.riderName === selectedRider ? (
