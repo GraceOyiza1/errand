@@ -140,13 +140,13 @@ export default function ShopperDashboard() {
     );
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Available Market Errands</h1>
-                <p className="text-slate-500 mt-1">Accept trips below to start shopping for clients.</p>
+        <div className="mx-auto max-w-6xl space-y-6 overflow-x-hidden px-3 py-4 sm:px-6 sm:py-6">
+            <div className="space-y-1">
+                <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">Available Market Errands</h1>
+                <p className="text-sm text-slate-500 sm:text-base">Accept trips below to start shopping for clients.</p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <p className="text-xs uppercase tracking-widest text-slate-400">Rider</p>
@@ -183,14 +183,14 @@ export default function ShopperDashboard() {
                         type="button"
                         onClick={handleJoinRider}
                         disabled={!joinName.trim() || !joinPhone.trim()}
-                        className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed whitespace-nowrap"
+                        className="w-full rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed whitespace-nowrap sm:w-auto"
                     >
                         Join as Rider
                     </button>
                 </div>
 
                 {message && (
-                    <p className="mt-3 rounded-xl bg-emerald-50 px-3 py-2 text-xs text-emerald-700">{message}</p>
+                    <p className="mt-3 rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>
                 )}
             </div>
 
@@ -202,17 +202,17 @@ export default function ShopperDashboard() {
             ) : (
                 <div className="space-y-4">
                     {visibleOrders.map((order) => (
-                        <div key={order.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <div key={order.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                                <div>
+                                <div className="min-w-0">
                                     <p className="text-xs uppercase tracking-widest text-slate-400">Order #{order.id.replace('demo-', '')}</p>
                                     <h2 className="mt-1 text-lg font-semibold text-slate-900">{order.marketName}</h2>
                                     <p className="mt-1 text-sm text-slate-500">Customer: <span className="font-medium text-slate-800">{order.customerName}</span></p>
-                                    <p className="mt-1 text-sm text-slate-500">Items: {order.items.map((item) => `${item.quantity} × ${item.name}`).join(', ')}</p>
+                                    <p className="mt-1 text-sm break-words text-slate-500">Items: {order.items.map((item) => `${item.quantity} × ${item.name}`).join(', ')}</p>
                                 </div>
-                                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">{order.status}</span>
+                                <span className="self-start rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">{order.status}</span>
                             </div>
-                            <div className="mt-3 grid gap-3 sm:grid-cols-4">
+                            <div className="mt-3 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                                 <div>
                                     <p className="text-xs text-slate-500">Assigned Rider</p>
                                     <p className="text-sm font-medium text-slate-800">{order.riderName}</p>
@@ -222,7 +222,7 @@ export default function ShopperDashboard() {
                                     <p className="text-sm font-medium text-slate-800">{order.paymentMethod === 'cash' ? 'Cash' : 'MoMo Placeholder'}</p>
                                 </div>
                                 <div>
-                                    <p className="text-xs text-slate-500">ETA</p>
+                                    <p className="text-xs text-slate-500">GMT</p>
                                     <p className="text-sm font-medium text-slate-800">{order.etaMinutes} min</p>
                                 </div>
                                 <div>
@@ -232,30 +232,30 @@ export default function ShopperDashboard() {
                             </div>
 
                             {order.status === 'pending' ? (
-                                <div className="mt-4 flex gap-2">
+                                <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                                     <button
                                         type="button"
                                         onClick={() => handleAcceptOrder(order.id)}
-                                        className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
+                                        className="w-full rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 sm:w-auto"
                                     >
                                         Accept Ride
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => handleCancelOrder(order.id)}
-                                        className="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500"
+                                        className="w-full rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500 sm:w-auto"
                                     >
                                         Cancel Order
                                     </button>
                                 </div>
                             ) : order.riderName === selectedRider ? (
-                                <div className="mt-4 flex gap-2">
+                                <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                                     <button
                                         type="button"
                                         onClick={() => handleCancelOrder(order.id)}
-                                        className="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500"
+                                        className="w-full rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500 sm:w-auto"
                                     >
-                                        Cancel Order
+                                        Order Delivered
                                     </button>
                                 </div>
                             ) : null}
