@@ -60,10 +60,10 @@ export default function ImageUploader({
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between gap-4">
-                <label className="block text-xs font-semibold text-slate-600">
+                <label className="block text-sm font-semibold text-slate-700">
                     {label}
                 </label>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-slate-500">
                     {images.length}/{maxImages}
                 </span>
             </div>
@@ -88,7 +88,7 @@ export default function ImageUploader({
                     </div>
                 ))}
                 {remaining > 0 && (
-                    <label className="group flex flex-col items-center justify-center border border-dashed border-slate-300 rounded-2xl p-4 text-center text-slate-500 hover:border-emerald-500 hover:text-emerald-600 cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    <label className="group flex flex-col items-center justify-center border border-dashed border-slate-300 rounded-2xl p-4 text-center text-slate-600 hover:border-emerald-500 hover:text-emerald-700 cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed">
                         <input
                             type="file"
                             accept="image/*"
@@ -97,8 +97,8 @@ export default function ImageUploader({
                             disabled={isUploading}
                             className="hidden"
                         />
-                        <span className="text-xl">{isUploading ? "⏳" : "+"}</span>
-                        <span className="text-xs mt-2">
+                        <span className="text-2xl">{isUploading ? "⏳" : "+"}</span>
+                        <span className="text-sm mt-2">
                             {isUploading ? "Uploading..." : "Upload image"}
                         </span>
                     </label>

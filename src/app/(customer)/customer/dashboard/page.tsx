@@ -529,7 +529,7 @@ export default function CustomerDashboard() {
                     <select
                       value={selectedCatalogItemId}
                       onChange={(e) => setSelectedCatalogItemId(e.target.value)}
-                      className="w-full text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600"
+                      className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400"
                     >
                       {MARKET_CATALOG.map((item) => (
                         <option key={item.id} value={item.id}>
@@ -549,7 +549,7 @@ export default function CustomerDashboard() {
                         placeholder="e.g., Locust beans (Dawadawa), Smoked herrings"
                         value={customItemName}
                         onChange={(e) => setCustomItemName(e.target.value)}
-                        className="w-full text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600"
+                        className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -562,7 +562,7 @@ export default function CustomerDashboard() {
                           placeholder="15"
                           value={customTargetPrice}
                           onChange={(e) => setCustomTargetPrice(e.target.value)}
-                          className="w-full text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600"
+                          className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400"
                         />
                       </div>
                       <div>
@@ -574,7 +574,7 @@ export default function CustomerDashboard() {
                           placeholder="e.g. 2 wraps, cups"
                           value={customUnit}
                           onChange={(e) => setCustomUnit(e.target.value)}
-                          className="w-full text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600"
+                          className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400"
                         />
                       </div>
                     </div>
@@ -590,7 +590,7 @@ export default function CustomerDashboard() {
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                    className="w-full text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600"
+                    className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400"
                   />
                 </div>
 
@@ -602,7 +602,7 @@ export default function CustomerDashboard() {
                     placeholder="e.g., If the ₵15 package is too small, check the ₵20 variant."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    className="w-full text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 h-20 resize-none"
+                    className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400 h-20 resize-none"
                   />
                 </div>
 
