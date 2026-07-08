@@ -131,30 +131,33 @@ export default function CustomerDashboard() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    let trackingId = window.sessionStorage.getItem("currentErrandOrderId");
+    // Restore name/phone from localStorage if previously saved
+    const savedName = window.localStorage.getItem("errand-customer-name");
+    const savedPhone = window.localStorage.getItem("errand-customer-phone");
+    if (savedName) setCustomerName(savedName);
+    if (savedPhone) setCustomerPhone(savedPhone);
 
-    const pollOrder = () => {
-      const savedOrders = window.localStorage.getItem("errand-demo-orders");
-      if (savedOrders && trackingId) {
-        try {
-          const parsedOrders = JSON.parse(savedOrders);
-          const currentOrder = parsedOrders.find(
-            (o: any) => o.id === trackingId,
+    const savedOrderId = window.localStorage.getItem("errand-last-order-id");
+    if (!savedOrderId) return;
+
+    const savedPhone2 = window.localStorage.getItem("errand-customer-phone") || "";
+    const customerId = `customer_${savedPhone2.replace(/\s+/g, "")}`;
+
+    const pollOrder = async () => {
+      try {
+        const res = await fetch(`/api/errands?customerId=${customerId}`);
+        const result = await res.json();
+        if (res.ok && result?.success && Array.isArray(result.data)) {
+          const found = result.data.find((o: Record<string, unknown>) =>
+            (o._id as string)?.toString() === savedOrderId || o.id === savedOrderId
           );
-          if (currentOrder) {
-            setConfirmedOrder(currentOrder);
-          }
-        } catch {
-          // Ignore
+          if (found) setConfirmedOrder(found as typeof confirmedOrder);
         }
-      }
+      } catch { /* ignore */ }
     };
 
-    // Initial poll
     pollOrder();
-
-    // Poll every 2 seconds for updates from the shopper dashboard
-    const interval = setInterval(pollOrder, 2000);
+    const interval = setInterval(pollOrder, 3000);
     return () => clearInterval(interval);
   }, []);
 
@@ -260,7 +263,8 @@ export default function CustomerDashboard() {
     setItems(items.filter((item) => item.id !== id));
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async (e?: React.FormEvent) => {
+    if (e && e.preventDefault) e.preventDefault();
     if (isCheckingOut) return;
 
     if (!customerName.trim() || !customerPhone.trim()) {
@@ -302,49 +306,80 @@ export default function CustomerDashboard() {
     }
 
     setIsCheckingOut(true);
-    const orderItems = items.map((item) => ({
-      ...item,
-    }));
+    setCheckoutMessage("Processing checkout...");
 
-    // eslint-disable-next-line react-hooks/purity
-    const generatedId = `demo-${Date.now()}`;
+    // Derive a stable customerId from the phone number
+    const customerId = `customer_${customerPhone.trim().replace(/\s+/g, "")}`;
 
-    const newOrder = {
-      id: generatedId,
-      customerName: customerName.trim(),
-      customerPhone: customerPhone.trim(),
-      marketName: selectedMarket.name,
-      status: "pending",
-      paymentMethod: selectedPaymentMethod,
-      riderName: "Pending assignment...",
-      riderMessage:
-        "Your order has been placed. Waiting for a shopper to accept your request.",
-      total: grandTotal,
-      etaMinutes: 0,
-      createdAt: new Date().toISOString(),
-      items: orderItems,
-    };
-
+    // Persist identity to localStorage so the orders page can look them up
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(
-        "errand-demo-orders",
-        JSON.stringify([newOrder, ...existingOrders]),
-      );
-      window.sessionStorage.setItem("currentErrandOrderId", newOrder.id);
+      window.localStorage.setItem("errand-customer-name", customerName.trim());
+      window.localStorage.setItem("errand-customer-phone", customerPhone.trim());
+      window.localStorage.setItem("errand-customer-id", customerId);
     }
 
-    setConfirmedOrder(newOrder);
-    setCheckoutMessage(
-      selectedPaymentMethod === "cash"
-        ? `Demo checkout saved. Waiting for a rider to accept your request.`
-        : `Demo checkout saved. Waiting for a rider to accept your request. No real money is used.`,
-    );
+    try {
+      const payload = {
+        customerId,
+        customerName: customerName.trim(),
+        customerPhone: customerPhone.trim(),
+        marketName: selectedMarket.name,
+        items: items.map(item => ({
+          name: item.name,
+          qty: item.quantity,
+          quantity: item.quantity,
+          unit: item.unit,
+          condition: item.notes,
+          notes: item.notes,
+          expectedPrice: item.targetPrice
+        })),
+        payout: grandTotal,
+        paymentMethod: selectedPaymentMethod,
+      };
 
-    setItems([]);
-    setTimeout(() => setIsCheckingOut(false), 1000);
+      const response = await fetch('/api/errands', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (result.success === true) {
+        const insertedId = result.insertedId?.toString() || `demo-${Date.now()}`;
+
+        // Save the last order ID so the dashboard can poll for it
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("errand-last-order-id", insertedId);
+        }
+
+        setConfirmedOrder({
+          id: insertedId,
+          customerName: customerName.trim(),
+          customerPhone: customerPhone.trim(),
+          marketName: selectedMarket.name,
+          status: "paid_editable",
+          paymentMethod: selectedPaymentMethod,
+          riderName: "Pending assignment...",
+          riderMessage: "Your order has been placed. Waiting for a shopper to accept your request.",
+          total: grandTotal,
+          etaMinutes: 0,
+          createdAt: new Date().toISOString(),
+          items: items.map((item) => ({ ...item })),
+        });
+        setCheckoutMessage("Order successfully created!");
+        setItems([]);
+      } else {
+        setCheckoutMessage(result.error || "Database write failed. Please try again.");
+      }
+    } catch {
+      setCheckoutMessage("An unexpected error occurred during checkout. Please try again.");
+    } finally {
+      setTimeout(() => setIsCheckingOut(false), 1000);
+    }
   };
 
-  // Math calculation using your business strategy
+  // Math calculation 
   const itemsSubtotal = items.reduce(
     (sum, item) => sum + item.targetPrice * item.quantity,
     0,
@@ -477,7 +512,7 @@ export default function CustomerDashboard() {
                 className="bg-emerald-600 text-white font-semibold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:bg-emerald-500 transition cursor-pointer"
                 onClick={() => setStep(2)}
               >
-                Continue to Shopping List
+                Continue to your Shopping List
               </button>
             </div>
           )}
@@ -509,14 +544,14 @@ export default function CustomerDashboard() {
                   className={`flex-1 text-xs py-2 rounded-lg font-medium transition cursor-pointer ${!isCustomMode ? "bg-white text-slate-900 shadow-xs" : "text-slate-500"}`}
                   onClick={() => setIsCustomMode(false)}
                 >
-                  Standard Catalog
+                  Standard Listing
                 </button>
                 <button
                   type="button"
                   className={`flex-1 text-xs py-2 rounded-lg font-medium transition cursor-pointer ${isCustomMode ? "bg-white text-slate-900 shadow-xs" : "text-slate-500"}`}
                   onClick={() => setIsCustomMode(true)}
                 >
-                  Custom Request (e.g. Locust Beans)
+                  Custom Request (e.g. Beans)
                 </button>
               </div>
 
@@ -524,7 +559,7 @@ export default function CustomerDashboard() {
                 {!isCustomMode ? (
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 mb-1">
-                      Select Commodity
+                      Select Item
                     </label>
                     <select
                       value={selectedCatalogItemId}
@@ -567,7 +602,7 @@ export default function CustomerDashboard() {
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-slate-600 mb-1">
-                          Metric/Unit
+                          Cups/Bags
                         </label>
                         <input
                           type="text"
@@ -599,7 +634,7 @@ export default function CustomerDashboard() {
                     Instructions for Rider
                   </label>
                   <textarea
-                    placeholder="e.g., If the ₵15 package is too small, check the ₵20 variant."
+                    placeholder="e.g., If the ₵15 package is too small, contact customer."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400 h-20 resize-none"
@@ -631,8 +666,7 @@ export default function CustomerDashboard() {
 
                 {items.length === 0 ? (
                   <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-12 text-center text-sm">
-                    Your items will appear here. Try adding custom locust beans
-                    to test!
+                    Your items will appear here.
                   </div>
                 ) : (
                   <div className="divide-y divide-slate-100 max-h-[250px] sm:max-h-[350px] md:max-h-[400px] overflow-y-auto">
@@ -715,7 +749,7 @@ export default function CustomerDashboard() {
                   </div>
                   <div className="border-t border-slate-800 my-2 pt-3 flex justify-between items-baseline">
                     <span className="font-bold text-sm sm:text-base">
-                      Total Escrow Hold
+                      Total Holding Amount
                     </span>
                     <span className="text-xl sm:text-2xl font-black text-emerald-400">
                       ₵{grandTotal.toFixed(2)}
@@ -750,10 +784,10 @@ export default function CustomerDashboard() {
                     </div>
                   </div>
 
-                  {/* Notice describing your exact business rules */}
+                  {/* Notice describing business rules */}
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-2 mt-4 leading-relaxed">
                     <p className="font-bold text-amber-400">
-                      💡 Errand Open-Market Guarantee Policy:
+                      Errand Open-Market Guarantee Policy:
                     </p>
                     <p>
                       1. If your custom items cost less than your target
@@ -861,7 +895,7 @@ export default function CustomerDashboard() {
                               {(timeLeft % 60).toString().padStart(2, "0")}
                             </p>
                             <p className="text-[10px] text-amber-700 mt-0.5">
-                              You have 3 minutes to modify items.
+                              You have 3 minutes to change items
                             </p>
                           </div>
                           <button
@@ -881,6 +915,23 @@ export default function CustomerDashboard() {
                           </p>
                         </div>
                       ) : null}
+
+                      {/* View My Orders CTA */}
+                      <div className="mt-5 flex flex-col sm:flex-row gap-3">
+                        <a
+                          href="/customer/orders"
+                          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm px-5 py-3 transition shadow-sm"
+                        >
+                          📦 View My Orders & Track Status
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => { setConfirmedOrder(null); setStep(0); }}
+                          className="flex-1 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-semibold text-sm px-5 py-3 transition"
+                        >
+                          Place Another Order
+                        </button>
+                      </div>
                     </div>
                   )}
 
@@ -890,8 +941,8 @@ export default function CustomerDashboard() {
                       className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm px-6 py-3 rounded-xl shadow-xs transition cursor-pointer"
                     >
                       {selectedPaymentMethod === "cash"
-                        ? "Confirm Test Cash Checkout"
-                        : "Confirm Test MoMo Checkout"}
+                        ? "Confirm Checkout"
+                        : "Confirm MoMo Checkout"}
                     </button>
                   </div>
                 </div>

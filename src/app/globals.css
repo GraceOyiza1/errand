@@ -6,11 +6,10 @@
   }
 }
 
-@import "tailwindcss";
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -18,13 +17,6 @@
   --color-foreground: var(--foreground);
   --font-sans: "Segoe UI", Arial, Helvetica, sans-serif;
   --font-mono: "SFMono-Regular", ui-monospace, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

@@ -1,21 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { initializeApp, getApps } from 'firebase/app';
-import {
-    getAuth,
-    signInAnonymously,
-    signInWithCustomToken,
-    onAuthStateChanged
-} from 'firebase/auth';
-import {
-    getFirestore,
-    doc,
-    setDoc,
-    getDoc,
-    collection,
-    onSnapshot,
-    updateDoc,
-    addDoc
-} from 'firebase/firestore';
+"use client";
+
+import React, { useState, useEffect } from "react";
 import {
     ShieldAlert,
     User,
@@ -27,555 +12,282 @@ import {
     MapPin,
     ShoppingBag,
     Truck,
-    Star,
-    DollarSign,
-    Camera,
-    X,
-    AlertCircle,
-    TrendingUp,
-    RefreshCw,
-    Bell
-} from 'lucide-react';
+    Star
+} from "lucide-react";
 
-// ==========================================
-// FIREBASE ENVIRONMENT CONFIGURATION SETUP
-// ==========================================
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'errand-default-sandbox';
-let db;
-let auth;
-
-// Safely initialize Firebase with environment keys or fallback
-const initializeFirebaseService = () => {
-    try {
-        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-            const firebaseConfig = JSON.parse(__firebase_config);
-            if (getApps().length === 0) {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-            }
-        } else {
-            // Graceful fallback for mock local preview if config isn't populated
-            db = null;
-            auth = null;
-        }
-    } catch (error) {
-        console.error("Firebase Initialization Error: ", error);
-        db = null;
-        auth = null;
-    }
-};
-
-initializeFirebaseService();
-
-export default function App() {
-    const [user, setUser] = useState(null);
-    const [userId, setUserId] = useState('demo-shopper-id-123');
-    const [useMockMode, setUseMockMode] = useState(false);
-
+export default function ShopperDashboardPage() {
     // 1. SHOPPER PROFILE STATES
-    const [shopperProfile, setShopperProfile] = useState({
-        fullName: '',
-        phone: '',
-        idType: 'Ghana Card',
-        idNumber: '',
-        vehicleType: 'Motorcycle',
-        isVerified: false,
-        onboardingStatus: 'unregistered' // unregistered, under_review, verified
-    });
+    // Simulated database profile status: 'unregistered', 'under_review', or 'verified'
+    const [shopperStatus, setShopperStatus] = useState<"unregistered" | "under_review" | "verified">("unregistered");
 
-    // 2. DISPATCH & PIPELINE DATA STATES
-    const [allErrands, setAllErrands] = useState([]);
-    const [activeErrand, setActiveErrand] = useState(null);
-    const [notification, setNotification] = useState(null);
-    const [shopperEarnings, setShopperEarnings] = useState(85.00);
-    const [completedRuns, setCompletedRuns] = useState([]);
+    // Registration Form Input States
+    const [fullName, setFullName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [idType, setIdType] = useState("Ghana Card");
+    const [idNumber, setIdNumber] = useState("");
+    const [vehicleType, setVehicleType] = useState("Motorcycle");
 
-    // 3. MANUAL TIME SETTINGS
+    // 2. ACTIVE ERRAND POOL STATES (Only visible to verified shoppers)
+    const [activeErrand, setActiveErrand] = useState<any>(null);
+    const [errandState, setErrandState] = useState<"pool" | "accepted" | "shopping" | "delivering" | "completed">("pool");
     const [shoppingTime, setShoppingTime] = useState("30");
     const [deliveryTime, setDeliveryTime] = useState("20");
+    const [poolErrands, setPoolErrands] = useState<any[]>([]);
+    const [historyErrands, setHistoryErrands] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // Onboarding Form Inputs
-    const [formName, setFormName] = useState('');
-    const [formPhone, setFormPhone] = useState('');
-    const [formIdType, setFormIdType] = useState('Ghana Card');
-    const [formIdNum, setFormIdNum] = useState('');
-    const [formVehicle, setFormVehicle] = useState('Motorcycle');
-
-    // ==========================================
-    // AUTHENTICATION & INITIAL DATABASE LISTENERS
-    // ==========================================
-    useEffect(() => {
-        if (!db || !auth) {
-            setUseMockMode(true);
-            loadMockInitialData();
-            return;
-        }
-
-        // Rule 3: Auth Before Queries
-        const authenticateUser = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Auth failed, falling back to mock mode: ", err);
-                setUseMockMode(true);
-                loadMockInitialData();
-            }
-        };
-
-        authenticateUser();
-
-        const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
-            if (currentUser) {
-                setUser(currentUser);
-                setUserId(currentUser.uid);
-
-                // Fetch/Listen to Shopper Profile
-                // Rule 1: Strict private path
-                const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'personalData');
-                const unsubProfile = onSnapshot(profileRef, (snapshot) => {
-                    if (snapshot.exists()) {
-                        setShopperProfile(snapshot.data());
-                    } else {
-                        // Unregistered default state
-                        setShopperProfile({
-                            fullName: '',
-                            phone: '',
-                            idType: 'Ghana Card',
-                            idNumber: '',
-                            vehicleType: 'Motorcycle',
-                            isVerified: false,
-                            onboardingStatus: 'unregistered'
-                        });
-                    }
-                }, (error) => {
-                    showNotification("System Error", "Failed to load profile. Using local fallback.");
-                });
-
-                // Fetch/Listen to Errands Feed
-                // Rule 1: Strict public path
-                const errandsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'errands');
-                const unsubErrands = onSnapshot(errandsCollection, (snapshot) => {
-                    const fetchedErrands = [];
-                    snapshot.forEach((doc) => {
-                        fetchedErrands.push({ id: doc.id, ...doc.data() });
-                    });
-                    setAllErrands(fetchedErrands);
-                }, (error) => {
-                    console.error("Error reading errands: ", error);
-                });
-
-                return () => {
-                    unsubProfile();
-                    unsubErrands();
-                };
-            }
-        });
-
-        return () => unsubscribeAuth();
-    }, []);
-
-    // Update active errand pipeline whenever collection data matches
-    useEffect(() => {
-        if (allErrands.length > 0) {
-            // Find if we have an active assigned errand in transit or shopping for this rider
-            const active = allErrands.find(e =>
-                e.riderId === userId &&
-                ['accepted', 'shopping', 'delivering'].includes(e.status)
-            );
-
-            // Real-time cancellation alert: if local state has active, but database shows it was canceled
-            if (activeErrand && !active) {
-                const dbUpdatedErrand = allErrands.find(e => e.id === activeErrand.id);
-                if (dbUpdatedErrand && dbUpdatedErrand.status === 'canceled') {
-                    showNotification(
-                        "⚠️ Errand Canceled!",
-                        `Your current run to ${activeErrand.marketName} was canceled by the customer. A ₵10 cancellation credit was sent to your wallet.`
-                    );
-                    setShopperEarnings(prev => prev + 10);
-                }
-            }
-
-            setActiveErrand(active || null);
-
-            // Collect completed runs for our history ledger
-            const completed = allErrands.filter(e => e.riderId === userId && e.status === 'delivered');
-            setCompletedRuns(completed);
-        }
-    }, [allErrands, userId]);
-
-    // ==========================================
-    // LOCAL MOCK STATE FALLBACK (PREVIEW MODE)
-    // ==========================================
-    const loadMockInitialData = () => {
-        setAllErrands([
-            {
-                id: "ERR-9921",
-                marketName: "Makola Market",
-                location: "Accra Central",
-                payout: "85.00",
-                status: "locked", // available in pool
-                items: [
-                    { name: "Yam (Pona Tuber)", qty: 2, condition: "Must be very firm, no soft spots" },
-                    { name: "Rodo (Pepper)", qty: 1, condition: "Leave my pepper unblended" }
-                ],
-                riderId: null
-            }
-        ]);
+    // Mock available order coming from a locked customer bucket
+    const mockAvailableOrder = {
+        id: "ERR-5592",
+        marketName: "Makola Market",
+        location: "Accra Central",
+        payout: "85.00",
+        items: [
+            { name: "Yam (Pona Tuber)", qty: 2, condition: "Must be very firm, no soft spots" },
+            { name: "Rodo (Pepper)", qty: 1, condition: "Leave my pepper unblended" },
+            { name: "Smoked Fish (Panla)", qty: 2, condition: "Dry and tightly wrapped" }
+        ]
     };
 
-    // Helper to trigger inside-app modal notification (no browser alert!)
-    const showNotification = (title, message) => {
-        setNotification({ title, message });
-    };
-
-    // ==========================================
-    // ONBOARDING VERIFICATION FORM ACTIONS
-    // ==========================================
-    const handleOnboardingSubmit = async (e) => {
+    // Submit profile details handler
+    const handleOnboardingSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formName || !formPhone || !formIdNum) {
-            showNotification("Missing Fields", "Please complete all verification inputs before submitting.");
+        if (!fullName || !phoneNumber || !idNumber) {
+            alert("Please fill in all verification fields.");
             return;
         }
+        // Set status to under review (conceptually updates database flag isVerified = false)
+        setShopperStatus("under_review");
+    };
 
-        const updatedProfile = {
-            fullName: formName,
-            phone: formPhone,
-            idType: formIdType,
-            idNumber: formIdNum,
-            vehicleType: formVehicle,
-            isVerified: false,
-            onboardingStatus: 'under_review'
-        };
+    const simulateAdminApproval = () => {
+        setShopperStatus("verified");
+        if (!idNumber) setIdNumber("user_unique_id_123");
+        if (!fullName) setFullName("Demo Shopper");
+        setErrandState("pool");
+    };
 
-        if (useMockMode) {
-            setShopperProfile(updatedProfile);
-        } else {
-            try {
-                // Rule 1: Write profile parameters securely
-                const profileRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'personalData');
-                await setDoc(profileRef, updatedProfile);
-            } catch (err) {
-                showNotification("Database Write Failed", err.message);
-            }
+    // Errand State Management Actions
+    const updateErrandAPI = async (status: string, extraUpdates: any = {}) => {
+        if (!activeErrand) return;
+        const errandId = activeErrand._id || activeErrand.id;
+        try {
+            await fetch('/api/errands', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: errandId,
+                    status,
+                    ...extraUpdates
+                })
+            });
+        } catch (e) {
+            console.error('Failed to update errand status via API:', e);
         }
     };
 
-    // Simulator Bypass (Allows instant approval testing)
-    const simulateAdminApproval = async () => {
-        const approvedProfile = {
-            ...shopperProfile,
-            isVerified: true,
-            onboardingStatus: 'verified'
-        };
-
-        if (useMockMode) {
-            setShopperProfile(approvedProfile);
-        } else {
-            try {
-                const profileRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'personalData');
-                await setDoc(profileRef, approvedProfile);
-            } catch (err) {
-                showNotification("Database Write Failed", err.message);
-            }
-        }
-    };
-
-    // ==========================================
-    // REAL-TIME OPERATIONS & STATUS STATE HOOKS
-    // ==========================================
-    const handleAcceptErrand = async (errandId) => {
-        if (useMockMode) {
-            setAllErrands(prev => prev.map(e => e.id === errandId ? {
-                ...e,
-                status: 'accepted',
-                riderId: userId,
-                riderName: shopperProfile.fullName || "Kofi Sourcing Pro",
-                riderPhone: shopperProfile.phone || "+233 24 123 4567"
-            } : e));
-        } else {
-            try {
-                const errandDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'errands', errandId);
-                await updateDoc(errandDocRef, {
-                    status: 'accepted',
-                    riderId: userId,
-                    riderName: shopperProfile.fullName,
-                    riderPhone: shopperProfile.phone,
-                    riderBike: shopperProfile.vehicleType
-                });
-            } catch (err) {
-                showNotification("Error", "Could not lock this errand from the database pool.");
-            }
+    const handleAcceptErrand = async (errand: any) => {
+        setActiveErrand(errand);
+        setErrandState("accepted");
+        
+        const errandId = errand._id || errand.id;
+        try {
+            await fetch('/api/errands', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: errandId,
+                    status: "accepted",
+                    riderId: idNumber || "user_unique_id_123",
+                    riderName: fullName || "Demo Shopper",
+                    riderMessage: "A shopper has accepted your request and is reviewing the details."
+                })
+            });
+            // Re-fetch to update history/pool
+            loadErrands();
+        } catch (e) {
+            console.error('Failed to update errand status via API:', e);
         }
     };
 
     const handleStartShopping = async () => {
-        if (!activeErrand) return;
-        const shoppingMinutes = Number(shoppingTime) || 30;
-        const deliveryMinutes = Number(deliveryTime) || 20;
+        setErrandState("shopping");
+        await updateErrandAPI("shopping", {
+            estShoppingTime: shoppingTime,
+            estDeliveryTime: deliveryTime,
+            riderMessage: "Shopper is now at the market purchasing your items."
+        });
+    };
 
-        if (useMockMode) {
-            setAllErrands(prev => prev.map(e => e.id === activeErrand.id ? {
-                ...e,
-                status: 'shopping',
-                estShoppingTime: shoppingMinutes,
-                estDeliveryTime: deliveryMinutes
-            } : e));
-        } else {
-            try {
-                const errandDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'errands', activeErrand.id);
-                await updateDoc(errandDocRef, {
-                    status: 'shopping',
-                    estShoppingTime: shoppingMinutes,
-                    estDeliveryTime: deliveryMinutes
-                });
-            } catch (err) {
-                showNotification("Error", "Database timeline synchronization failed.");
+    const handleCompleteShoppingAndTransit = async () => {
+        setErrandState("delivering");
+        await updateErrandAPI("delivering", {
+            riderMessage: "Shopper has completed purchasing and is en route for delivery."
+        });
+    };
+
+    const handleConfirmDropoff = async () => {
+        setErrandState("completed");
+        await updateErrandAPI("completed", {
+            riderMessage: "Delivery complete! Thank you for using Errand."
+        });
+    };
+
+    const handleClearErrandRun = () => {
+        setActiveErrand(null);
+        setErrandState("pool");
+    };
+
+    const loadErrands = async () => {
+        if (shopperStatus !== "verified") return;
+        try {
+            // Fetch 1: Look for open marketplace jobs
+            const poolRes = await fetch('/api/errands?role=shopper');
+            const poolResult = await poolRes.json();
+            if (poolRes.ok && poolResult?.success) {
+                setPoolErrands(Array.isArray(poolResult.data) ? poolResult.data : []);
             }
+
+            // Fetch 2: Look for this shopper's history
+            const historyUrl = `/api/errands?role=shopper&riderId=${idNumber || 'user_unique_id_123'}`;
+            const historyRes = await fetch(historyUrl);
+            const historyResult = await historyRes.json();
+            if (historyRes.ok && historyResult?.success) {
+                setHistoryErrands(Array.isArray(historyResult.data) ? historyResult.data : []);
+            }
+        } catch (error) {
+            console.error("Failed to load errands:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleUploadProofAndTransit = async () => {
-        if (!activeErrand) return;
-
-        if (useMockMode) {
-            setAllErrands(prev => prev.map(e => e.id === activeErrand.id ? {
-                ...e,
-                status: 'delivering',
-                proofPhoto: "mock_uploaded"
-            } : e));
-        } else {
-            try {
-                const errandDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'errands', activeErrand.id);
-                await updateDoc(errandDocRef, {
-                    status: 'delivering',
-                    proofPhoto: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80" // Flat-lay verification proof sample
-                });
-            } catch (err) {
-                showNotification("Error", "Could not complete flat-lay proof upload.");
+    useEffect(() => {
+        loadErrands();
+        const intervalId = setInterval(() => {
+            if (errandState === 'pool') {
+                loadErrands();
             }
-        }
-    };
-
-    const handleCompleteDelivery = async () => {
-        if (!activeErrand) return;
-
-        if (useMockMode) {
-            setAllErrands(prev => prev.map(e => e.id === activeErrand.id ? {
-                ...e,
-                status: 'delivered'
-            } : e));
-            setShopperEarnings(prev => prev + Number(activeErrand.payout));
-        } else {
-            try {
-                const errandDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'errands', activeErrand.id);
-                await updateDoc(errandDocRef, {
-                    status: 'delivered'
-                });
-                setShopperEarnings(prev => prev + Number(activeErrand.payout));
-            } catch (err) {
-                showNotification("Error", "Completion handover failed to sync.");
-            }
-        }
-    };
-
-    // ==========================================
-    // REAL-TIME SIMULATOR: CUSTOMER TRIGGER BOX
-    // ==========================================
-    const triggerSimulationOrder = async () => {
-        const freshMockOrder = {
-            id: "ERR-" + Math.floor(1000 + Math.random() * 9000),
-            marketName: "Kejetia Market",
-            location: "Kumasi",
-            payout: "95.00",
-            status: "locked", // Immediately available in the pool
-            items: [
-                { name: "Smoked Fish (Panla)", qty: 3, condition: "Must be dry and tightly wrapped" },
-                { name: "Ripe Plantain", qty: 2, condition: "Deep yellow, firm texture" }
-            ],
-            riderId: null
-        };
-
-        if (useMockMode) {
-            setAllErrands(prev => [...prev, freshMockOrder]);
-            showNotification("Simulator Sync", "A customer paid and locked an errand! It's now visible in your pool.");
-        } else {
-            try {
-                // Write fresh locked order into database to test crossing devices
-                const errandsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'errands');
-                await addDoc(errandsCollection, freshMockOrder);
-                showNotification("Firestore Sync", "Real-time Order injected successfully! Look at your pool below.");
-            } catch (err) {
-                showNotification("Simulation Failed", err.message);
-            }
-        }
-    };
-
-    const triggerSimulationCancel = async () => {
-        if (!activeErrand) {
-            showNotification("Simulator Error", "You must accept an active errand before simulating a customer cancellation.");
-            return;
-        }
-
-        if (useMockMode) {
-            setAllErrands(prev => prev.map(e => e.id === activeErrand.id ? { ...e, status: 'canceled' } : e));
-        } else {
-            try {
-                const errandDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'errands', activeErrand.id);
-                await updateDoc(errandDocRef, { status: 'canceled' });
-            } catch (err) {
-                console.error(err);
-            }
-        }
-    };
+        }, 5000);
+        return () => clearInterval(intervalId);
+    }, [idNumber, errandState, shopperStatus]);
 
     return (
-        <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col">
+        <div className="min-h-screen bg-slate-50 text-slate-800 p-4 md:p-8">
+            <div className="max-w-4xl mx-auto">
 
-            {/* 1. TOP HEADER BANNER */}
-            <header className="bg-slate-900 text-white shadow-md">
-                <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between">
-                    <div className="flex items-center space-x-3 text-center md:text-left">
-                        <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xl shadow-md">
-                            🏍️
-                        </div>
-                        <div>
-                            <div className="flex items-center space-x-2">
-                                <h1 className="text-xl font-black tracking-tight">ERRAND <span className="text-emerald-400">Shopper Dashboard</span></h1>
-                                <span className={`text-[9px] px-2 py-0.5 rounded font-black ${useMockMode ? 'bg-amber-500 text-slate-950' : 'bg-emerald-600 text-white animate-pulse'}`}>
-                                    {useMockMode ? 'MOCK INTERACTIVE' : 'REAL-TIME DB LIVE'}
-                                </span>
-                            </div>
-                            <p className="text-xs text-slate-400 mt-0.5">Sourcing and logistics panel for Ghana & Nigeria</p>
-                        </div>
+                {/* TOP MAIN HEADER */}
+                <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 mb-8">
+                    <div>
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900">🏍️ Errand Shopper Hub</h1>
+                        <p className="text-xs text-slate-500 mt-1">Fulfill market requests, manage operations, and track local daily runs</p>
                     </div>
 
-                    <div className="mt-4 md:mt-0 flex items-center space-x-3">
-                        <span className="text-xs font-bold text-slate-400">Security Gate:</span>
-                        {shopperProfile.onboardingStatus === 'unregistered' && (
-                            <span className="text-xs font-black bg-red-900/50 text-red-300 border border-red-800 px-3 py-1.5 rounded-full">🚫 Blocked (KYC Required)</span>
+                    {/* Status Badge */}
+                    <div className="mt-3 sm:mt-0 self-start sm:self-center flex items-center space-x-2">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Guard Profile:</span>
+                        {shopperStatus === "unregistered" && (
+                            <span className="text-xs font-black bg-red-100 text-red-700 px-3 py-1 rounded-full border border-red-200">❌ Unverified Gate</span>
                         )}
-                        {shopperProfile.onboardingStatus === 'under_review' && (
-                            <span className="text-xs font-black bg-amber-900/50 text-amber-300 border border-amber-800 px-3 py-1.5 rounded-full animate-pulse">⏳ Document Reviewing</span>
+                        {shopperStatus === "under_review" && (
+                            <span className="text-xs font-black bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200 animate-pulse">⏳ Under Review</span>
                         )}
-                        {shopperProfile.onboardingStatus === 'verified' && (
-                            <span className="text-xs font-black bg-emerald-900/50 text-emerald-300 border border-emerald-800 px-3 py-1.5 rounded-full">✓ Verified Rider</span>
-                        )}
-                    </div>
-                </div>
-            </header>
-
-            {/* 2. REAL-TIME SYNC TESTING TOOLBAR */}
-            <section className="bg-slate-800 text-slate-100 py-3 px-4 border-b border-slate-700">
-                <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center space-x-2">
-                        <Bell className="w-4 h-4 text-emerald-400 animate-bounce" />
-                        <p className="text-xs text-slate-300">
-                            <strong>Testing Console:</strong> Use these buttons to simulate actions made by a customer on another device!
-                        </p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                        <button
-                            onClick={triggerSimulationOrder}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-extrabold px-3 py-1.5 rounded-lg flex items-center space-x-1 transition"
-                        >
-                            <span>➕ Simulate Customer Order & Pay</span>
-                        </button>
-                        {activeErrand && (
-                            <button
-                                onClick={triggerSimulationCancel}
-                                className="bg-red-600 hover:bg-red-700 text-white text-[11px] font-extrabold px-3 py-1.5 rounded-lg flex items-center space-x-1 transition"
-                            >
-                                <span>🚫 Simulate Customer Cancel</span>
-                            </button>
+                        {shopperStatus === "verified" && (
+                            <span className="text-xs font-black bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200">✅ Authorized Sourcing Agent</span>
                         )}
                     </div>
-                </div>
-            </section>
+                </header>
 
-            {/* 3. MAIN DASHBOARD CONTENT GRID */}
-            <main className="max-w-6xl mx-auto px-4 py-8 flex-1 w-full">
-
-                {/* ==============================================
-            GATE 1: UNREGISTERED FORM (KYC FORM REQUIRED)
-           ============================================== */}
-                {shopperProfile.onboardingStatus === 'unregistered' && (
-                    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden max-w-2xl mx-auto">
-                        <div className="bg-red-600 p-5 text-white flex items-center space-x-3">
-                            <ShieldAlert className="w-8 h-8 shrink-0 animate-pulse" />
+                {/* =========================================================
+            STATE 1: UNREGISTERED SHOPPER (THE KYC ONBOARDING FORM GATE)
+           ========================================================= */}
+                {shopperStatus === "unregistered" && (
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+                        <div className="bg-gradient-to-r from-red-500 to-orange-500 p-5 text-white flex items-center space-x-3">
+                            <ShieldAlert className="w-6 h-6 shrink-0" />
                             <div>
-                                <h2 className="font-extrabold text-lg">Shopper Security Protocol Check</h2>
-                                <p className="text-xs text-red-100">You must register your profile identification and vehicle details before viewing open customer lists.</p>
+                                <h2 className="font-extrabold text-base">Verification Required</h2>
+                                <p className="text-xs text-red-50 text-slate-100">To maintain safety and trust in open markets, complete verification to unlock live errands.</p>
                             </div>
                         </div>
 
                         <form onSubmit={handleOnboardingSubmit} className="p-6 space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Full Legal Name</label>
+                                    <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5 flex items-center space-x-1">
+                                        <User className="w-3.5 h-3.5 text-slate-400" />
+                                        <span>Full Legal Name</span>
+                                    </label>
                                     <input
                                         type="text"
                                         required
-                                        value={formName}
-                                        onChange={(e) => setFormName(e.target.value)}
-                                        placeholder="Matches your Identity Card"
-                                        className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition bg-slate-50"
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                        placeholder="e.g. Kofi Mensah"
+                                        className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:border-slate-900 focus:outline-none transition bg-slate-50"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-bold text-slate-500 uppercase block mb-1">MoMo / Contact Number</label>
+                                    <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5 flex items-center space-x-1">
+                                        <Phone className="w-3.5 h-3.5 text-slate-400" />
+                                        <span>Mobile Money / Contact Phone</span>
+                                    </label>
                                     <input
                                         type="tel"
                                         required
-                                        value={formPhone}
-                                        onChange={(e) => setFormPhone(e.target.value)}
+                                        value={phoneNumber}
+                                        onChange={(e) => setPhoneNumber(e.target.value)}
                                         placeholder="e.g. +233 24 123 4567"
-                                        className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition bg-slate-50"
+                                        className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:border-slate-900 focus:outline-none transition bg-slate-50"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-bold text-slate-500 uppercase block mb-1">ID Card Type</label>
+                                    <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5 flex items-center space-x-1">
+                                        <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+                                        <span>Identification Document Type</span>
+                                    </label>
                                     <select
-                                        value={formIdType}
-                                        onChange={(e) => setFormIdType(e.target.value)}
-                                        className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition bg-slate-50 h-[46px]"
+                                        value={idType}
+                                        onChange={(e) => setIdType(e.target.value)}
+                                        className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:border-slate-900 focus:outline-none transition bg-slate-50 h-[46px]"
                                     >
                                         <option value="Ghana Card">Ghana Card</option>
                                         <option value="Voters ID">Voters ID</option>
-                                        <option value="Passport">Passport</option>
+                                        <option value="Passport">National Passport</option>
                                     </select>
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Unique Document Number</label>
+                                    <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5 flex items-center space-x-1">
+                                        <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+                                        <span>Unique ID Card Number</span>
+                                    </label>
                                     <input
                                         type="text"
                                         required
-                                        value={formIdNum}
-                                        onChange={(e) => setFormIdNum(e.target.value)}
-                                        placeholder="e.g. GHA-10294829-1"
-                                        className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition bg-slate-50"
+                                        value={idNumber}
+                                        onChange={(e) => setIdNumber(e.target.value)}
+                                        placeholder="e.g. GHA-72910839-4"
+                                        className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:border-slate-900 focus:outline-none transition bg-slate-50"
                                     />
                                 </div>
 
-                                <div className="sm:col-span-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5">Logistics Ride Mode</label>
+                                <div className="md:col-span-2">
+                                    <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5 flex items-center space-x-1">
+                                        <Bike className="w-3.5 h-3.5 text-slate-400" />
+                                        <span>Logistics / Transport Mode</span>
+                                    </label>
                                     <div className="grid grid-cols-3 gap-2">
-                                        {["Motorcycle", "Bicycle", "On-Foot"].map((mode) => (
+                                        {["Motorcycle", "Bicycle", "On Foot / Walking"].map((mode) => (
                                             <button
                                                 key={mode}
                                                 type="button"
-                                                onClick={() => setFormVehicle(mode)}
-                                                className={`p-3 rounded-xl border text-xs font-extrabold transition text-center ${formVehicle === mode
-                                                        ? "border-emerald-600 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-600/15"
-                                                        : "border-slate-200 bg-white hover:border-slate-300 text-slate-600"
+                                                onClick={() => setVehicleType(mode)}
+                                                className={`p-3 rounded-xl border text-xs font-bold transition text-center ${vehicleType === mode
+                                                    ? "border-slate-900 bg-slate-900 text-white shadow-md"
+                                                    : "border-slate-200 bg-white hover:border-slate-400"
                                                     }`}
                                             >
                                                 {mode}
@@ -588,317 +300,310 @@ export default function App() {
                             <div className="pt-4 border-t border-slate-100">
                                 <button
                                     type="submit"
-                                    className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold uppercase tracking-widest py-4 rounded-xl transition"
+                                    className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold uppercase tracking-wider py-4 rounded-xl transition shadow-lg"
                                 >
-                                    📤 Submit Verification Files
+                                    📤 Submit Verification Documents
                                 </button>
                             </div>
                         </form>
                     </div>
                 )}
 
-                {/* ==============================================
-            GATE 2: UNDER REVIEW SCREEN
-           ============================================== */}
-                {shopperProfile.onboardingStatus === 'under_review' && (
-                    <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-lg max-w-xl mx-auto space-y-4">
+                {/* =========================================================
+            STATE 2: UNDER REVIEW STATUS (BLOCKED FROM DISPATCH POOL)
+           ========================================================= */}
+                {shopperStatus === "under_review" && (
+                    <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-lg space-y-4">
                         <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto border border-amber-200">
                             <Clock className="w-8 h-8 animate-spin" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-black text-slate-900">Your Errand Profile Vetting is Underway</h2>
-                            <p className="text-xs text-slate-500 max-w-md mx-auto mt-2 leading-relaxed">
-                                Thank you, <strong>{shopperProfile.fullName}</strong>. Admin verification of credentials and MoMo registers typically requires 15 minutes.
-                                Use the bypass simulation key below to unlock your pool instantly for testing.
+                            <h2 className="text-xl font-extrabold text-slate-900">Your Documents are Under Admin Review</h2>
+                            <p className="text-sm text-slate-500 max-w-md mx-auto mt-2 leading-relaxed">
+                                Thank you for uploading your identification profile details, <strong>{fullName}</strong>.
+                                Our backend review team is currently cross-referencing your profile credentials.
+                                We will lift this gate immediately upon activation.
                             </p>
                         </div>
 
                         <div className="pt-6 border-t border-slate-100 max-w-xs mx-auto">
                             <button
                                 onClick={simulateAdminApproval}
-                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold py-3 rounded-xl transition shadow-md"
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition"
                             >
-                                ⚡ Simulate Instant Admin Verification
+                                ⚙️ Simulate Admin Approval (Demo Bypass)
                             </button>
                         </div>
                     </div>
                 )}
 
-                {/* ==============================================
-            GATE 3: VERIFIED DISPATCH & POOL PIPELINE
-           ============================================== */}
-                {shopperProfile.onboardingStatus === 'verified' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                        {/* Left/Middle Column: Available Pool & Sourcing Checklist */}
-                        <div className="lg:col-span-2 space-y-6">
-
-                            {/* AVAILABLE JOB BOARD */}
-                            {!activeErrand && (
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                                        <div>
-                                            <h2 className="text-base font-black text-slate-900 uppercase tracking-tight">🛒 Sourcing Request Pool</h2>
-                                            <p className="text-xs text-slate-500">Pick an active market request to begin earning</p>
-                                        </div>
-                                        <span className="text-xs bg-slate-200 px-3 py-1 rounded-full font-bold text-slate-700">
-                                            {allErrands.filter(e => e.status === 'locked').length} available
-                                        </span>
+                {/* =========================================================
+            STATE 3: VERIFIED SHOPPER (THE EXCLUSIVE LIVE DISPATCH DASHBOARD)
+           ========================================================= */}
+                {shopperStatus === "verified" && (
+                    <div className="space-y-6">
+                        {loading ? (
+                            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                                <div className="animate-pulse space-y-4">
+                                    <div className="h-4 rounded-full bg-slate-200 w-3/5" />
+                                    <div className="h-4 rounded-full bg-slate-200 w-2/5" />
+                                    <div className="grid gap-4 md:grid-cols-3">
+                                        <div className="h-32 rounded-2xl bg-slate-200" />
+                                        <div className="h-32 rounded-2xl bg-slate-200" />
+                                        <div className="h-32 rounded-2xl bg-slate-200" />
                                     </div>
-
-                                    {allErrands.filter(e => e.status === 'locked').length === 0 ? (
-                                        <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center space-y-2">
-                                            <p className="text-sm text-slate-400 font-bold">No locked orders are currently in the pool.</p>
-                                            <button
-                                                onClick={triggerSimulationOrder}
-                                                className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 font-extrabold px-4 py-2 rounded-xl hover:bg-emerald-100 transition"
-                                            >
-                                                ⚡ Simulate Customer Adding List & Paying
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="grid grid-cols-1 gap-4">
-                                            {allErrands.filter(e => e.status === 'locked').map((errand) => (
-                                                <div key={errand.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
-                                                    <div className="flex justify-between items-start mb-4">
-                                                        <div>
-                                                            <div className="flex items-center space-x-1 text-xs text-slate-400 font-semibold">
-                                                                <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                                                                <span>{errand.marketName} • {errand.location}</span>
-                                                            </div>
-                                                            <h3 className="font-extrabold text-sm text-slate-900 mt-1">Multi-item Household Restock</h3>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <span className="text-[10px] text-slate-400 font-black uppercase block">Rider Payout</span>
-                                                            <span className="text-base font-black text-emerald-700">₵{errand.payout}</span>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-4 text-xs space-y-2">
-                                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Inspected Items:</span>
-                                                        <ul className="space-y-1.5 font-semibold text-slate-700">
-                                                            {errand.items?.map((item, idx) => (
-                                                                <li key={idx} className="flex justify-between">
-                                                                    <span>• {item.qty}x {item.name}</span>
-                                                                    <span className="text-[11px] text-slate-500 italic">"{item.condition}"</span>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-
-                                                    <button
-                                                        onClick={() => handleAcceptErrand(errand.id)}
-                                                        className="w-full bg-slate-900 hover:bg-emerald-600 text-white font-extrabold text-xs uppercase py-3 rounded-xl transition"
-                                                    >
-                                                        🤝 Accept Job & Update Customer Dashboard
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
                                 </div>
-                            )}
+                            </div>
+                        ) : null}
 
-                            {/* ACTIVE SOURCING PIPELINE OPERATION */}
-                            {activeErrand && (
-                                <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-lg space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                                    {/* Operation Status Bar */}
-                                    <div className="flex justify-between items-center pb-4 border-b border-slate-100">
-                                        <div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Assigned Order ID</span>
-                                            <h3 className="text-lg font-black text-slate-900">{activeErrand.id}</h3>
+                            {/* Left Column: Live Jobs & Pipeline Tasks */}
+                            <div className="md:col-span-2 space-y-6">
+
+                                {/* Pool Status Tracker */}
+                                {errandState === "pool" && poolErrands.map((errand: any) => (
+                                    <div key={errand._id || errand.id} className="bg-white border-2 border-slate-900 rounded-2xl p-5 shadow-lg relative overflow-hidden mb-6">
+                                        <div className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-bl-xl animate-pulse">
+                                            New Errand Match
                                         </div>
-                                        <span className="text-xs bg-emerald-50 text-emerald-800 font-black px-3 py-1 rounded-lg uppercase tracking-wider border border-emerald-200 animate-pulse">
-                                            STATUS: {activeErrand.status}
-                                        </span>
-                                    </div>
 
-                                    {/* SUB-FLOW A: ACCEPTED (SET MANUAL TIMER COUNTER) */}
-                                    {activeErrand.status === 'accepted' && (
-                                        <div className="p-5 bg-orange-50 border border-orange-200 rounded-xl space-y-4">
+                                        <div className="flex justify-between items-start mb-4">
                                             <div>
-                                                <h4 className="font-extrabold text-xs text-orange-950 uppercase tracking-wider flex items-center space-x-1.5">
-                                                    <Clock className="w-4 h-4 text-orange-600" />
-                                                    <span>Define Manual Sourcing Times</span>
-                                                </h4>
-                                                <p className="text-[11px] text-orange-700 mt-1 leading-normal">
-                                                    Provide your exact estimated minutes to the customer. This will update their countdown screen in real-time.
-                                                </p>
-                                            </div>
-
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <div>
-                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Market Shopping (Mins)</label>
-                                                    <input
-                                                        type="number"
-                                                        value={shoppingTime}
-                                                        onChange={(e) => setShoppingTime(e.target.value)}
-                                                        className="w-full bg-white text-xs p-3 rounded-lg border border-slate-200 font-bold focus:outline-none"
-                                                    />
+                                                <div className="flex items-center space-x-2 text-slate-500 text-xs font-bold">
+                                                    <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                                                    <span>{errand.marketName} • {errand.location || 'Local Market'}</span>
                                                 </div>
-                                                <div>
-                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Bike Transit Delivery (Mins)</label>
-                                                    <input
-                                                        type="number"
-                                                        value={deliveryTime}
-                                                        onChange={(e) => setDeliveryTime(e.target.value)}
-                                                        className="w-full bg-white text-xs p-3 rounded-lg border border-slate-200 font-bold focus:outline-none"
-                                                    />
-                                                </div>
+                                                <h3 className="text-base font-extrabold text-slate-900 mt-1">Bulk Household Restock Run</h3>
                                             </div>
-
-                                            <button
-                                                onClick={handleStartShopping}
-                                                className="w-full bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs uppercase py-3.5 rounded-xl transition"
-                                            >
-                                                🚀 Lock Estimates & Start Market Sourcing
-                                            </button>
+                                            <div className="text-right">
+                                                <span className="text-[10px] text-slate-400 uppercase font-bold block">Guaranteed Payout</span>
+                                                <span className="text-lg font-black text-slate-950">₵{errand.payout}</span>
+                                            </div>
                                         </div>
-                                    )}
 
-                                    {/* SUB-FLOW B: SHOPPING & QUALITY FLAT-LAY PROOF */}
-                                    {activeErrand.status === 'shopping' && (
-                                        <div className="space-y-4">
-                                            <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
-                                                <h4 className="font-extrabold text-xs text-amber-900 uppercase tracking-wider flex items-center space-x-1">
-                                                    <ShoppingBag className="w-4 h-4 text-amber-600" />
-                                                    <span>Quality Inspections (Makola Stall Check)</span>
-                                                </h4>
-                                                <p className="text-[10px] text-amber-700 mt-0.5">Please manually verify each items meets the customers specified conditions.</p>
-
-                                                <div className="space-y-2 mt-3">
-                                                    {activeErrand.items?.map((item, idx) => (
-                                                        <div key={idx} className="bg-white border border-slate-100 p-3 rounded-xl flex items-center justify-between text-xs">
-                                                            <div>
-                                                                <span className="font-extrabold text-slate-900">{item.qty}x {item.name}</span>
-                                                                <span className="block text-[10px] text-slate-400 italic mt-0.5">Note: "{item.condition}"</span>
-                                                            </div>
-                                                            <span className="text-[10px] bg-emerald-50 text-emerald-800 font-black px-2 py-0.5 rounded-full">Inspected</span>
+                                        {/* Scrapebook Items Preview */}
+                                        <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-5">
+                                            <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider block mb-2">Inspect & Purchase Checklist:</span>
+                                            <ul className="space-y-2.5">
+                                                {errand.items && errand.items.map((item: any, idx: number) => (
+                                                    <li key={idx} className="text-xs flex justify-between items-start border-b border-slate-200/50 pb-1.5 last:border-0 last:pb-0">
+                                                        <div>
+                                                            <span className="font-extrabold text-slate-900">{item.quantity || item.qty}x {item.name}</span>
+                                                            {item.condition && <span className="block text-[11px] text-slate-500 italic mt-0.5">⚠️ Condition: {item.condition}</span>}
+                                                            {item.notes && <span className="block text-[11px] text-slate-500 italic mt-0.5">⚠️ Notes: {item.notes}</span>}
                                                         </div>
-                                                    ))}
-                                                </div>
-                                            </div>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
 
-                                            {/* Single Flat-lay verification phototaker */}
-                                            <div className="border-2 border-dashed border-slate-200 p-5 rounded-2xl bg-slate-50 text-center space-y-3">
-                                                <Camera className="w-8 h-8 text-slate-400 mx-auto animate-pulse" />
-                                                <h5 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Take Single Complete Flat-Lay Photo</h5>
-                                                <p className="text-[11px] text-slate-500 max-w-sm mx-auto leading-relaxed">
-                                                    Lay everything cleanly together inside the transit crate. Take one single photograph to verify bundle quality and speed up delivery.
-                                                </p>
+                                        <button
+                                            onClick={() => handleAcceptErrand(errand)}
+                                            className="w-full bg-slate-900 hover:bg-emerald-600 text-white font-extrabold text-xs uppercase tracking-wider py-4 rounded-xl transition"
+                                        >
+                                            🤝 Accept Errand & Update Customer
+                                        </button>
+                                    </div>
+                                ))}
+
+                                {/* ACTIVE ORDER WORKING PIPELINE LAYOUT */}
+                                {["accepted", "shopping", "delivering", "completed"].includes(errandState) && activeErrand && (
+                                    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-md space-y-6">
+
+                                        {/* Status Indicator */}
+                                        <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                                            <div>
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider">Active Run Reference ID</span>
+                                                <h3 className="font-black text-base text-slate-900">{activeErrand.id}</h3>
+                                            </div>
+                                            <span className="text-xs font-bold bg-slate-100 text-slate-800 px-3 py-1 rounded-lg uppercase">
+                                                Status: <strong className="text-emerald-700">{errandState}</strong>
+                                            </span>
+                                        </div>
+
+                                        {/* STEP A: MANUAL TIME ADJUSTMENTS (MANUAL CUSTOMER COOLDOWN TIMERS) */}
+                                        {errandState === "accepted" && (
+                                            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 space-y-4">
+                                                <div>
+                                                    <h4 className="font-extrabold text-xs text-orange-950 uppercase tracking-wider flex items-center space-x-1">
+                                                        <Clock className="w-4 h-4 text-orange-600" />
+                                                        <span>Set Manual Errand Countdown Estimates</span>
+                                                    </h4>
+                                                    <p className="text-[11px] text-orange-700 mt-1">
+                                                        Estimate your timeline accurately for the customer's live dashboard tracking panel before entering the market grounds.
+                                                    </p>
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Market Shopping (Mins)</label>
+                                                        <input
+                                                            type="number"
+                                                            value={shoppingTime}
+                                                            onChange={(e) => setShoppingTime(e.target.value)}
+                                                            className="w-full bg-white text-xs p-2.5 rounded-lg border border-slate-200 font-bold focus:outline-none"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Bike Delivery Transit (Mins)</label>
+                                                        <input
+                                                            type="number"
+                                                            value={deliveryTime}
+                                                            onChange={(e) => setDeliveryTime(e.target.value)}
+                                                            className="w-full bg-white text-xs p-2.5 rounded-lg border border-slate-200 font-bold focus:outline-none"
+                                                        />
+                                                    </div>
+                                                </div>
+
                                                 <button
-                                                    onClick={handleUploadProofAndTransit}
-                                                    className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition"
+                                                    onClick={handleStartShopping}
+                                                    className="w-full bg-orange-600 hover:bg-orange-700 text-white font-extrabold py-3 rounded-lg text-xs transition"
                                                 >
-                                                    📸 Snap & Handover to Bike Rider
+                                                    🚀 Dispatch Estimates & Start Sourcing
                                                 </button>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {/* SUB-FLOW C: TRANSIT ROAD TO CLIENT */}
-                                    {activeErrand.status === 'delivering' && (
-                                        <div className="bg-blue-50 border border-blue-100 p-6 rounded-2xl text-center space-y-4">
-                                            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mx-auto">
-                                                <Truck className="w-6 h-6 animate-pulse" />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-extrabold text-sm text-blue-950">Package Safely Locked in Crate</h4>
-                                                <p className="text-xs text-blue-700 mt-1">Driving to coordinates. Expected time left: {deliveryTime} mins.</p>
-                                            </div>
+                                        {/* STEP B: MARKET WORKPLACE VETTING CHECKS & SINGLE PHOTO PROOF */}
+                                        {errandState === "shopping" && (
+                                            <div className="space-y-4">
+                                                <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
+                                                    <h4 className="font-extrabold text-xs text-amber-900 uppercase tracking-wider flex items-center space-x-1">
+                                                        <ShoppingBag className="w-4 h-4 text-amber-600" />
+                                                        <span>Sourcing Quality Inspection Ledger</span>
+                                                    </h4>
+                                                    <p className="text-[11px] text-amber-700 mt-0.5">Cross-check conditions with market women to protect order values.</p>
 
-                                            <button
-                                                onClick={handleCompleteDelivery}
-                                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs uppercase py-3.5 rounded-xl transition shadow-md"
-                                            >
-                                                ✅ Confirm Drop-off Complete (Credit Earnings)
-                                            </button>
-                                        </div>
-                                    )}
-
-                                </div>
-                            )}
-
-                        </div>
-
-                        {/* Right Column: Earnings Summary Ledger & History Logs */}
-                        <div className="space-y-6">
-
-                            {/* Daily Tracker Wallet Box */}
-                            <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-md space-y-4">
-                                <div>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Wallet Balance</span>
-                                    <span className="text-3xl font-black block tracking-tight text-emerald-400 mt-1">₵{shopperEarnings.toFixed(2)}</span>
-                                </div>
-                                <div className="border-t border-slate-800 pt-3 flex justify-between text-xs text-slate-400 font-medium">
-                                    <span>Successful Rides Logged:</span>
-                                    <span className="font-bold text-white">{completedRuns.length} runs</span>
-                                </div>
-                            </div>
-
-                            {/* Verified Rider Profile Header */}
-                            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex items-center space-x-3">
-                                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 text-lg">👩‍✈️</div>
-                                <div>
-                                    <h4 className="font-extrabold text-xs text-slate-900">{shopperProfile.fullName || "Kofi Sourcing Pro"}</h4>
-                                    <p className="text-[10px] text-slate-400 mt-0.5">{shopperProfile.vehicleType} Mode</p>
-                                    <div className="flex items-center space-x-1 mt-0.5">
-                                        <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
-                                        <span className="text-[9px] font-bold text-slate-600">4.9 Performance Stars</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Verified Rides ledger history */}
-                            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
-                                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider block">Your Completed Runs</h4>
-
-                                {completedRuns.length === 0 ? (
-                                    <p className="text-xs text-slate-400 italic">No runs logged yet today.</p>
-                                ) : (
-                                    <div className="space-y-2">
-                                        {completedRuns.map((run) => (
-                                            <div key={run.id} className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs flex justify-between items-start">
-                                                <div>
-                                                    <strong className="text-slate-900 block">{run.id}</strong>
-                                                    <span className="text-[10px] text-slate-400 block mt-0.5">{run.marketName} Run</span>
+                                                    <div className="space-y-2 mt-3">
+                                                        {activeErrand.items.map((item: any, idx: number) => (
+                                                            <div key={idx} className="bg-white p-3 rounded-xl border border-slate-100 flex items-center justify-between text-xs">
+                                                                <div>
+                                                                    <span className="font-extrabold text-slate-900">{item.qty}x {item.name}</span>
+                                                                    <span className="block text-[10px] text-slate-400 italic">Check: {item.condition}</span>
+                                                                </div>
+                                                                <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Approved Vetted</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                                <span className="font-black text-emerald-600">+₵{run.payout}</span>
+
+                                                {/* Single Flat-Lay photo rule container simulation */}
+                                                <div className="p-4 border border-slate-200 rounded-xl bg-slate-50 text-center space-y-3">
+                                                    <span className="text-2xl block">📸</span>
+                                                    <h5 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Capture Final Group Basket Photo</h5>
+                                                    <p className="text-[11px] text-slate-500 max-w-sm mx-auto leading-normal">
+                                                        Lay out all items together in your delivery crate to save time and avoid hassle before loading your bike.
+                                                    </p>
+                                                    <button
+                                                        onClick={handleCompleteShoppingAndTransit}
+                                                        className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition"
+                                                    >
+                                                        Upload Single Haul Photo & Dispatch Rider
+                                                    </button>
+                                                </div>
                                             </div>
-                                        ))}
+                                        )}
+
+                                        {/* STEP C: DISPATCH & DELIVERY MAP HANDOVER OVERVIEW */}
+                                        {errandState === "delivering" && (
+                                            <div className="bg-blue-50 border border-blue-200 p-5 rounded-xl text-center space-y-3">
+                                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto text-blue-600">
+                                                    <Truck className="w-5 h-5 animate-pulse" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-extrabold text-sm text-blue-950">Errand Package En Route To Client</h4>
+                                                    <p className="text-xs text-blue-700 mt-0.5">Estimated transit delivery timeline duration remaining: {deliveryTime} minutes.</p>
+                                                </div>
+                                                <button
+                                                    onClick={handleConfirmDropoff}
+                                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-lg text-xs transition shadow-md"
+                                                >
+                                                    ✅ Confirm Drop-off Complete
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {/* STEP D: COMPLETED SUMMARY OVERVIEW */}
+                                        {errandState === "completed" && (
+                                            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center space-y-2">
+                                                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center mx-auto text-emerald-600">
+                                                    <CheckCircle className="w-4 h-4" />
+                                                </div>
+                                                <h4 className="font-extrabold text-xs text-emerald-950 uppercase tracking-wider">Run Completed Successfully!</h4>
+                                                <p className="text-[11px] text-emerald-700">Earnings have been credited. The client was notified for rating reviews.</p>
+                                                <button
+                                                    onClick={handleClearErrandRun}
+                                                    className="text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-lg px-3 py-1.5 mt-2 hover:bg-slate-50"
+                                                >
+                                                    Clear Route Pipeline
+                                                </button>
+                                            </div>
+                                        )}
+
                                     </div>
                                 )}
+
+                                {errandState === "pool" && poolErrands.length === 0 && (
+                                    <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-400 text-xs font-medium">
+                                        📭 No active local market requests currently listed in your station pool.
+                                    </div>
+                                )}
+
+                            </div>
+
+                            {/* Right Column: Rides Log Ledger & Wallet Earnings History */}
+                            <div className="space-y-6">
+
+                                {/* Profile Bio summary panel */}
+                                <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center space-x-3">
+                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-base border border-slate-200">👨‍✈️</div>
+                                    <div>
+                                        <h4 className="font-extrabold text-xs text-slate-900">{fullName || "Kofi Mensah"}</h4>
+                                        <p className="text-[10px] text-slate-400 mt-0.5">{vehicleType} Logistics Mode</p>
+                                        <div className="flex items-center space-x-1 mt-0.5">
+                                            <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
+                                            <span className="text-[9px] font-bold text-slate-600">4.9 Rating Balance</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Live Wallet Summary Ledger Panel */}
+                                <div className="bg-slate-900 rounded-2xl p-5 text-white shadow-md">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Mobile Money Earnings</span>
+                                    <span className="text-3xl font-black block tracking-tight mt-1">₵{errandState === "completed" ? "110.00" : "85.00"}</span>
+
+                                    <div className="border-t border-slate-800 mt-3 pt-3 flex justify-between text-xs text-slate-400 font-medium">
+                                        <span>Total Rides Logged:</span>
+                                        <span className="font-bold text-white">{errandState === "completed" ? "4 runs" : "3 runs"}</span>
+                                    </div>
+                                </div>
+
+                                {/* Rides History Records Ledger */}
+                                <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+                                    <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider block">Your Past Runs Ledger</span>
+
+                                    <div className="space-y-2">
+                                        {historyErrands.length > 0 ? historyErrands.map((history: any) => (
+                                            <div key={history._id || history.id} className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs flex justify-between items-start">
+                                                <div>
+                                                    <strong className="text-slate-900 block">{history.customerId || "Customer"}</strong>
+                                                    <span className="text-[10px] text-slate-400 block mt-0.5">{history.marketName} - <span className="uppercase text-emerald-700">{history.status}</span></span>
+                                                </div>
+                                                <span className="font-extrabold text-emerald-600">₵{history.payout}</span>
+                                            </div>
+                                        )) : (
+                                            <div className="text-xs text-slate-500 text-center py-2">No past runs yet.</div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
-
                     </div>
                 )}
 
-            </main>
-
-            {/* ==============================================
-          CUSTOM INTERNAL MODAL NOTIFICATION
-         ============================================== */}
-            {notification && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl p-6 max-w-sm w-full space-y-4">
-                        <div className="flex items-center space-x-3 text-emerald-600">
-                            <AlertCircle className="w-6 h-6 shrink-0" />
-                            <h4 className="font-extrabold text-base text-slate-900">{notification.title}</h4>
-                        </div>
-                        <p className="text-xs text-slate-600 leading-normal">{notification.message}</p>
-                        <button
-                            onClick={() => setNotification(null)}
-                            className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-2.5 rounded-xl text-xs transition"
-                        >
-                            Okay, Understood
-                        </button>
-                    </div>
-                </div>
-            )}
-
+            </div>
         </div>
     );
 }
