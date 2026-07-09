@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
+@theme {
+  --color-errand-obsidian: #131616;
+  --color-errand-leaf: #1E4631;
+  --color-errand-clay: #C05C3E;
+  --color-errand-ochre: #E3A845;
+  --color-errand-alabaster: #FAF8F5;
+}
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply bg-errand-alabaster text-errand-obsidian antialiased;
   }
 }
 

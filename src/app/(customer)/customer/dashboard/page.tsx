@@ -399,7 +399,7 @@ export default function CustomerDashboard() {
       {step === 0 && (
         <div className="space-y-6 sm:space-y-8 w-full mt-6 sm:mt-10">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="font-extrabold tracking-tight text-slate-900 text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight">
+            <h1 className="font-extrabold tracking-tight text-errand-obsidian text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight">
               Welcome to Errand
             </h1>
             <p className="text-slate-500 mt-2 sm:mt-3 text-xs sm:text-sm md:text-base lg:text-lg">
@@ -413,7 +413,7 @@ export default function CustomerDashboard() {
               <img src="/images/mkt3.jpg" alt="Quality goods" className="h-24 sm:h-28 md:h-32 rounded-2xl border border-slate-200 object-cover w-full" />
             </div>
           </div>
-          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 w-full sm:max-w-md mx-auto">
+          <div className="bg-errand-alabaster p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 w-full sm:max-w-md mx-auto">
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-slate-600 mb-2">
                 Your Name
@@ -423,7 +423,7 @@ export default function CustomerDashboard() {
                 placeholder="e.g. Ama Ghana"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full text-xs sm:text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600"
+                className="w-full text-xs sm:text-sm border p-2.5 rounded-xl bg-errand-alabaster focus:outline-emerald-600"
               />
             </div>
             <div>
@@ -435,7 +435,7 @@ export default function CustomerDashboard() {
                 placeholder="e.g. 054 123 4567"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
-                className="w-full text-xs sm:text-sm border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600"
+                className="w-full text-xs sm:text-sm border p-2.5 rounded-xl bg-errand-alabaster focus:outline-emerald-600"
               />
             </div>
             <button
@@ -445,7 +445,7 @@ export default function CustomerDashboard() {
                 }
               }}
               disabled={!customerName.trim() || !customerPhone.trim()}
-              className="w-full bg-emerald-600 text-white font-semibold text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl hover:bg-emerald-500 transition disabled:bg-slate-300 disabled:cursor-not-allowed"
+              className="w-full bg-errand-leaf text-white font-semibold text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl hover:bg-errand-leaf transition disabled:bg-slate-300 disabled:cursor-not-allowed"
             >
               Continue to Markets
             </button>
@@ -457,7 +457,7 @@ export default function CustomerDashboard() {
         <div className="space-y-4 sm:space-y-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-0">
             <div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-errand-obsidian">
                 Request a New Errand
               </h1>
               <p className="text-slate-500 mt-1 sm:mt-2 text-sm sm:text-base">
@@ -466,7 +466,7 @@ export default function CustomerDashboard() {
             </div>
             <button
               onClick={() => setStep(0)}
-              className="text-xs sm:text-sm font-medium text-slate-500 hover:text-emerald-600 cursor-pointer whitespace-nowrap"
+              className="text-xs sm:text-sm font-medium text-slate-500 hover:text-errand-leaf cursor-pointer whitespace-nowrap"
             >
               Edit Profile
             </button>
@@ -477,7 +477,7 @@ export default function CustomerDashboard() {
               <div
                 key={market.id}
                 onClick={() => setSelectedMarket(market)}
-                className={`overflow-hidden bg-white border rounded-2xl shadow-xs hover:shadow-md transition cursor-pointer ${selectedMarket?.id === market.id
+                className={`overflow-hidden bg-errand-alabaster border rounded-2xl shadow-xs hover:shadow-md transition cursor-pointer ${selectedMarket?.id === market.id
                   ? "ring-2 ring-emerald-600 border-transparent"
                   : "border-slate-200"
                   }`}
@@ -494,7 +494,7 @@ export default function CustomerDashboard() {
                     <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600">
                       {market.tag}
                     </span>
-                    <span className="text-sm font-bold text-emerald-600">
+                    <span className="text-sm font-bold text-errand-leaf">
                       ₵{market.baseDeliveryFee} delivery
                     </span>
                   </div>
@@ -509,7 +509,7 @@ export default function CustomerDashboard() {
           {selectedMarket && (
             <div className="flex justify-end pt-3 sm:pt-4 border-t border-slate-200">
               <button
-                className="bg-emerald-600 text-white font-semibold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:bg-emerald-500 transition cursor-pointer"
+                className="bg-errand-leaf text-white font-semibold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:bg-errand-leaf transition cursor-pointer"
                 onClick={() => setStep(2)}
               >
                 Continue to your Shopping List
@@ -525,11 +525,11 @@ export default function CustomerDashboard() {
             <div>
               <button
                 onClick={() => setStep(1)}
-                className="text-xs font-medium text-emerald-600 hover:underline mb-2 block cursor-pointer"
+                className="text-xs font-medium text-errand-leaf hover:underline mb-2 block cursor-pointer"
               >
                 ← Change Market
               </button>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-errand-obsidian">
                 Create List for {selectedMarket.name}
               </h1>
             </div>
@@ -537,18 +537,18 @@ export default function CustomerDashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {/* Input Form Box */}
-            <div className="bg-white border border-slate-200 p-4 sm:p-6 rounded-2xl h-fit space-y-4 sm:space-y-5 shadow-xs">
+            <div className="bg-errand-alabaster border border-slate-200 p-4 sm:p-6 rounded-2xl h-fit space-y-4 sm:space-y-5 shadow-xs">
               <div className="flex bg-slate-100 p-1 rounded-xl">
                 <button
                   type="button"
-                  className={`flex-1 text-xs py-2 rounded-lg font-medium transition cursor-pointer ${!isCustomMode ? "bg-white text-slate-900 shadow-xs" : "text-slate-500"}`}
+                  className={`flex-1 text-xs py-2 rounded-lg font-medium transition cursor-pointer ${!isCustomMode ? "bg-errand-alabaster text-errand-obsidian shadow-xs" : "text-slate-500"}`}
                   onClick={() => setIsCustomMode(false)}
                 >
                   Standard Listing
                 </button>
                 <button
                   type="button"
-                  className={`flex-1 text-xs py-2 rounded-lg font-medium transition cursor-pointer ${isCustomMode ? "bg-white text-slate-900 shadow-xs" : "text-slate-500"}`}
+                  className={`flex-1 text-xs py-2 rounded-lg font-medium transition cursor-pointer ${isCustomMode ? "bg-errand-alabaster text-errand-obsidian shadow-xs" : "text-slate-500"}`}
                   onClick={() => setIsCustomMode(true)}
                 >
                   Custom Request (e.g. Beans)
@@ -564,7 +564,7 @@ export default function CustomerDashboard() {
                     <select
                       value={selectedCatalogItemId}
                       onChange={(e) => setSelectedCatalogItemId(e.target.value)}
-                      className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400"
+                      className="w-full text-sm text-errand-obsidian border p-2.5 rounded-xl bg-errand-alabaster focus:outline-emerald-600 placeholder:text-slate-400"
                     >
                       {MARKET_CATALOG.map((item) => (
                         <option key={item.id} value={item.id}>
@@ -584,7 +584,7 @@ export default function CustomerDashboard() {
                         placeholder="e.g., Locust beans (Dawadawa), Smoked herrings"
                         value={customItemName}
                         onChange={(e) => setCustomItemName(e.target.value)}
-                        className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400"
+                        className="w-full text-sm text-errand-obsidian border p-2.5 rounded-xl bg-errand-alabaster focus:outline-emerald-600 placeholder:text-slate-400"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -597,7 +597,7 @@ export default function CustomerDashboard() {
                           placeholder="15"
                           value={customTargetPrice}
                           onChange={(e) => setCustomTargetPrice(e.target.value)}
-                          className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400"
+                          className="w-full text-sm text-errand-obsidian border p-2.5 rounded-xl bg-errand-alabaster focus:outline-emerald-600 placeholder:text-slate-400"
                         />
                       </div>
                       <div>
@@ -609,7 +609,7 @@ export default function CustomerDashboard() {
                           placeholder="e.g. 2 wraps, cups"
                           value={customUnit}
                           onChange={(e) => setCustomUnit(e.target.value)}
-                          className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400"
+                          className="w-full text-sm text-errand-obsidian border p-2.5 rounded-xl bg-errand-alabaster focus:outline-emerald-600 placeholder:text-slate-400"
                         />
                       </div>
                     </div>
@@ -625,7 +625,7 @@ export default function CustomerDashboard() {
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                    className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400"
+                    className="w-full text-sm text-errand-obsidian border p-2.5 rounded-xl bg-errand-alabaster focus:outline-emerald-600 placeholder:text-slate-400"
                   />
                 </div>
 
@@ -637,7 +637,7 @@ export default function CustomerDashboard() {
                     placeholder="e.g., If the ₵15 package is too small, contact customer."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    className="w-full text-sm text-slate-900 border p-2.5 rounded-xl bg-slate-50 focus:outline-emerald-600 placeholder:text-slate-400 h-20 resize-none"
+                    className="w-full text-sm text-errand-obsidian border p-2.5 rounded-xl bg-errand-alabaster focus:outline-emerald-600 placeholder:text-slate-400 h-20 resize-none"
                   />
                 </div>
 
@@ -650,7 +650,7 @@ export default function CustomerDashboard() {
 
                 <button
                   type="submit"
-                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm py-2.5 rounded-xl transition cursor-pointer"
+                  className="w-full bg-errand-leaf hover:bg-errand-leaf text-white font-medium text-sm py-2.5 rounded-xl transition cursor-pointer"
                 >
                   Add to Errand Bucket
                 </button>
@@ -659,8 +659,8 @@ export default function CustomerDashboard() {
 
             {/* Receipt Summary Box */}
             <div className="md:col-span-1 lg:col-span-2 space-y-4 sm:space-y-6">
-              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-xs order-last md:order-none">
-                <div className="bg-slate-50 px-6 py-3 border-b font-semibold text-xs text-slate-500 uppercase tracking-wider">
+              <div className="bg-errand-alabaster border border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-xs order-last md:order-none">
+                <div className="bg-errand-alabaster px-6 py-3 border-b font-semibold text-xs text-slate-500 uppercase tracking-wider">
                   Current Errand Bucket
                 </div>
 
@@ -673,7 +673,7 @@ export default function CustomerDashboard() {
                     {items.map((item) => (
                       <div
                         key={item.id}
-                        className="p-3 sm:p-4 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 hover:bg-slate-50/20"
+                        className="p-3 sm:p-4 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 hover:bg-errand-alabaster/20"
                       >
                         <div className="flex-1">
                           <div className="flex flex-wrap items-center gap-2">
@@ -681,7 +681,7 @@ export default function CustomerDashboard() {
                               {item.name}
                             </h4>
                             {item.isCustom && (
-                              <span className="text-[9px] sm:text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm font-bold">
+                              <span className="text-[9px] sm:text-[10px] bg-errand-ochre text-errand-ochre px-1.5 py-0.5 rounded-sm font-bold">
                                 Unlisted Request
                               </span>
                             )}
@@ -691,7 +691,7 @@ export default function CustomerDashboard() {
                             {item.targetPrice.toFixed(2)}
                           </p>
                           {item.notes && (
-                            <p className="text-xs text-emerald-600 mt-1">
+                            <p className="text-xs text-errand-leaf mt-1">
                               📌 {item.notes}
                             </p>
                           )}
@@ -709,7 +709,7 @@ export default function CustomerDashboard() {
                           )}
                         </div>
                         <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2 sm:gap-0">
-                          <span className="font-bold text-slate-900 text-xs sm:text-sm">
+                          <span className="font-bold text-errand-obsidian text-xs sm:text-sm">
                             ₵{(item.targetPrice * item.quantity).toFixed(2)}
                           </span>
                           <button
@@ -751,7 +751,7 @@ export default function CustomerDashboard() {
                     <span className="font-bold text-sm sm:text-base">
                       Total Holding Amount
                     </span>
-                    <span className="text-xl sm:text-2xl font-black text-emerald-400">
+                    <span className="text-xl sm:text-2xl font-black text-errand-leaf">
                       ₵{grandTotal.toFixed(2)}
                     </span>
                   </div>
@@ -767,7 +767,7 @@ export default function CustomerDashboard() {
                           setSelectedPaymentMethod("mobile-money");
                           setCheckoutMessage("");
                         }}
-                        className={`rounded-xl px-3 py-2 text-sm font-medium transition ${selectedPaymentMethod === "mobile-money" ? "bg-emerald-500 text-slate-950" : "bg-slate-900 text-slate-200 hover:bg-slate-800"}`}
+                        className={`rounded-xl px-3 py-2 text-sm font-medium transition ${selectedPaymentMethod === "mobile-money" ? "bg-errand-leaf text-errand-obsidian" : "bg-slate-900 text-slate-200 hover:bg-slate-800"}`}
                       >
                         Pay with MoMo / Paystack
                       </button>
@@ -777,7 +777,7 @@ export default function CustomerDashboard() {
                           setSelectedPaymentMethod("cash");
                           setCheckoutMessage("");
                         }}
-                        className={`rounded-xl px-3 py-2 text-sm font-medium transition ${selectedPaymentMethod === "cash" ? "bg-amber-400 text-slate-950" : "bg-slate-900 text-slate-200 hover:bg-slate-800"}`}
+                        className={`rounded-xl px-3 py-2 text-sm font-medium transition ${selectedPaymentMethod === "cash" ? "bg-errand-ochre text-errand-obsidian" : "bg-slate-900 text-slate-200 hover:bg-slate-800"}`}
                       >
                         Cash on Delivery
                       </button>
@@ -786,7 +786,7 @@ export default function CustomerDashboard() {
 
                   {/* Notice describing business rules */}
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-2 mt-4 leading-relaxed">
-                    <p className="font-bold text-amber-400">
+                    <p className="font-bold text-errand-ochre">
                       Errand Open-Market Guarantee Policy:
                     </p>
                     <p>
@@ -810,24 +810,24 @@ export default function CustomerDashboard() {
 
                   {checkoutMessage && (
                     <div
-                      className={`rounded-xl px-4 py-3 text-xs ${selectedPaymentMethod === "cash" ? "bg-amber-500/10 text-amber-300" : "bg-emerald-500/10 text-emerald-300"}`}
+                      className={`rounded-xl px-4 py-3 text-xs ${selectedPaymentMethod === "cash" ? "bg-errand-ochre/10 text-errand-ochre" : "bg-errand-leaf/10 text-errand-leaf"}`}
                     >
                       {checkoutMessage}
                     </div>
                   )}
 
                   {confirmedOrder && (
-                    <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5">
+                    <div className="mt-4 rounded-2xl border border-errand-leaf bg-errand-leaf/50 p-5">
                       <div className="flex items-center justify-between gap-3">
                         <div>
-                          <p className="text-[10px] uppercase tracking-widest text-emerald-700">
+                          <p className="text-[10px] uppercase tracking-widest text-errand-leaf">
                             Confirmed Order
                           </p>
-                          <h3 className="mt-1 text-base font-semibold text-slate-900">
+                          <h3 className="mt-1 text-base font-semibold text-errand-obsidian">
                             {confirmedOrder.marketName}
                           </h3>
                         </div>
-                        <span className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">
+                        <span className="rounded-full bg-errand-leaf px-3 py-1 text-xs font-semibold text-white">
                           {confirmedOrder.status}
                         </span>
                       </div>
@@ -837,13 +837,13 @@ export default function CustomerDashboard() {
                           <p className="text-xs text-slate-500">
                             Assigned Rider
                           </p>
-                          <p className="text-sm font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-errand-obsidian">
                             {confirmedOrder.riderName}
                           </p>
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">ETA</p>
-                          <p className="text-sm font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-errand-obsidian">
                             {confirmedOrder.etaMinutes > 0
                               ? `${confirmedOrder.etaMinutes} min`
                               : "Pending..."}
@@ -851,7 +851,7 @@ export default function CustomerDashboard() {
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">Payment</p>
-                          <p className="text-sm font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-errand-obsidian">
                             {confirmedOrder.paymentMethod === "cash"
                               ? "Cash on Delivery"
                               : "MoMo Placeholder"}
@@ -859,11 +859,11 @@ export default function CustomerDashboard() {
                         </div>
                       </div>
 
-                      <div className="mt-4 rounded-xl bg-white p-3 text-sm text-slate-700">
+                      <div className="mt-4 rounded-xl bg-errand-alabaster p-3 text-sm text-slate-700">
                         <p className="text-xs uppercase tracking-widest text-slate-500">
                           Rider update
                         </p>
-                        <p className="mt-1 font-medium text-slate-900">
+                        <p className="mt-1 font-medium text-errand-obsidian">
                           {confirmedOrder.riderMessage}
                         </p>
                       </div>
@@ -876,7 +876,7 @@ export default function CustomerDashboard() {
                           {confirmedOrder.items.map((item, index) => (
                             <li
                               key={`${confirmedOrder.id}-${index}`}
-                              className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-sm text-slate-700"
+                              className="flex items-center justify-between rounded-xl bg-errand-alabaster px-3 py-2 text-sm text-slate-700"
                             >
                               <span>
                                 {item.quantity} × {item.name} ({item.unit})
@@ -888,19 +888,19 @@ export default function CustomerDashboard() {
                       </div>
 
                       {timeLeft !== null && timeLeft > 0 ? (
-                        <div className="mt-5 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between">
+                        <div className="mt-5 p-4 bg-errand-ochre border border-errand-ochre rounded-xl flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-bold text-amber-800">
+                            <p className="text-xs font-bold text-errand-ochre">
                               Order locks in {Math.floor(timeLeft / 60)}:
                               {(timeLeft % 60).toString().padStart(2, "0")}
                             </p>
-                            <p className="text-[10px] text-amber-700 mt-0.5">
+                            <p className="text-[10px] text-errand-ochre mt-0.5">
                               You have 3 minutes to change items
                             </p>
                           </div>
                           <button
                             onClick={handleEditOrder}
-                            className="text-xs font-bold bg-amber-200 text-amber-900 px-4 py-2 rounded-lg hover:bg-amber-300 transition shadow-xs cursor-pointer"
+                            className="text-xs font-bold bg-errand-ochre text-errand-ochre px-4 py-2 rounded-lg hover:bg-errand-ochre transition shadow-xs cursor-pointer"
                           >
                             Edit Order
                           </button>
@@ -920,14 +920,14 @@ export default function CustomerDashboard() {
                       <div className="mt-5 flex flex-col sm:flex-row gap-3">
                         <a
                           href="/customer/orders"
-                          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm px-5 py-3 transition shadow-sm"
+                          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-errand-leaf hover:bg-errand-leaf text-white font-bold text-sm px-5 py-3 transition shadow-sm"
                         >
                           📦 View My Orders & Track Status
                         </a>
                         <button
                           type="button"
                           onClick={() => { setConfirmedOrder(null); setStep(0); }}
-                          className="flex-1 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-semibold text-sm px-5 py-3 transition"
+                          className="flex-1 rounded-xl border border-slate-200 bg-errand-alabaster text-slate-700 hover:bg-errand-alabaster font-semibold text-sm px-5 py-3 transition"
                         >
                           Place Another Order
                         </button>
@@ -938,7 +938,7 @@ export default function CustomerDashboard() {
                   <div className="flex justify-end pt-4">
                     <button
                       onClick={handleCheckout}
-                      className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm px-6 py-3 rounded-xl shadow-xs transition cursor-pointer"
+                      className="bg-errand-leaf hover:bg-errand-leaf text-errand-obsidian font-bold text-sm px-6 py-3 rounded-xl shadow-xs transition cursor-pointer"
                     >
                       {selectedPaymentMethod === "cash"
                         ? "Confirm Checkout"

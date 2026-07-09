@@ -6,11 +6,11 @@ export default function CustomerLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen flex flex-col bg-slate-50/50">
-            <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-8 py-4 flex justify-between items-center">
+        <div className="min-h-screen flex flex-col bg-errand-alabaster/50">
+            <header className="sticky top-0 z-50 bg-errand-alabaster/80 backdrop-blur-md border-b border-slate-200/80 px-8 py-4 flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                    <span className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
-                    <h2 className="text-xl font-bold tracking-tight text-slate-900">Errand Hub</h2>
+                    <span className="h-3 w-3 rounded-full bg-errand-leaf animate-pulse" />
+                    <h2 className="text-xl font-bold tracking-tight text-errand-obsidian">Errand Hub</h2>
                 </div>
                 <div className="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">
                     Role: Customer

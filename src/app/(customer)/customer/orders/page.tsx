@@ -32,12 +32,12 @@ interface Errand {
 }
 
 const STATUS_STEPS = [
-    { key: 'paid_editable', label: 'Order Placed', icon: '📋', color: 'text-blue-600' },
-    { key: 'locked',        label: 'Locked & Open', icon: '🔒', color: 'text-amber-600' },
+    { key: 'paid_editable', label: 'Order Placed', icon: '📋', color: 'text-errand-clay' },
+    { key: 'locked',        label: 'Locked & Open', icon: '🔒', color: 'text-errand-ochre' },
     { key: 'accepted',      label: 'Shopper Assigned', icon: '🤝', color: 'text-purple-600' },
-    { key: 'shopping',      label: 'Shopping Now', icon: '🛒', color: 'text-orange-600' },
-    { key: 'delivering',    label: 'On The Way', icon: '🏍️', color: 'text-indigo-600' },
-    { key: 'completed',     label: 'Delivered!', icon: '✅', color: 'text-emerald-600' },
+    { key: 'shopping',      label: 'Shopping Now', icon: '🛒', color: 'text-errand-ochre' },
+    { key: 'delivering',    label: 'On The Way', icon: '🏍️', color: 'text-errand-clay' },
+    { key: 'completed',     label: 'Delivered!', icon: '✅', color: 'text-errand-leaf' },
 ];
 
 const STATUS_INDEX: Record<string, number> = {
@@ -64,9 +64,9 @@ function StatusTimeline({ status }: { status: string }) {
                                 <div
                                     className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
                                         done
-                                            ? 'bg-emerald-500 border-emerald-500 text-white'
+                                            ? 'bg-errand-leaf border-errand-leaf text-white'
                                             : active
-                                            ? 'bg-white border-emerald-500 text-emerald-600 shadow-md scale-110'
+                                            ? 'bg-errand-alabaster border-errand-leaf text-errand-leaf shadow-md scale-110'
                                             : 'bg-slate-100 border-slate-200 text-slate-400'
                                     }`}
                                 >
@@ -74,7 +74,7 @@ function StatusTimeline({ status }: { status: string }) {
                                 </div>
                                 <p
                                     className={`mt-1 text-[9px] font-semibold text-center max-w-[56px] leading-tight ${
-                                        active ? 'text-emerald-700' : done ? 'text-slate-600' : 'text-slate-400'
+                                        active ? 'text-errand-leaf' : done ? 'text-slate-600' : 'text-slate-400'
                                     }`}
                                 >
                                     {step.label}
@@ -83,7 +83,7 @@ function StatusTimeline({ status }: { status: string }) {
                             {idx < STATUS_STEPS.length - 1 && (
                                 <div
                                     className={`h-0.5 w-8 mx-1 rounded-full transition-all ${
-                                        idx < currentIdx ? 'bg-emerald-400' : 'bg-slate-200'
+                                        idx < currentIdx ? 'bg-errand-leaf' : 'bg-slate-200'
                                     }`}
                                 />
                             )}
@@ -191,12 +191,12 @@ export default function CustomerOrdersPage() {
     };
 
     const statusBadge: Record<string, string> = {
-        paid_editable: 'bg-blue-100 text-blue-700',
-        locked: 'bg-amber-100 text-amber-700',
+        paid_editable: 'bg-blue-100 text-errand-clay',
+        locked: 'bg-errand-ochre text-errand-ochre',
         accepted: 'bg-purple-100 text-purple-700',
-        shopping: 'bg-orange-100 text-orange-700',
-        delivering: 'bg-indigo-100 text-indigo-700',
-        completed: 'bg-emerald-100 text-emerald-700',
+        shopping: 'bg-errand-ochre text-errand-ochre',
+        delivering: 'bg-indigo-100 text-errand-clay',
+        completed: 'bg-errand-leaf text-errand-leaf',
         cancelled: 'bg-rose-100 text-rose-600',
     };
 
@@ -205,13 +205,13 @@ export default function CustomerOrdersPage() {
         return (
             <div className="max-w-2xl mx-auto px-4 py-16 text-center space-y-4">
                 <div className="text-5xl">📦</div>
-                <h1 className="text-2xl font-extrabold text-slate-900">No Orders Yet</h1>
+                <h1 className="text-2xl font-extrabold text-errand-obsidian">No Orders Yet</h1>
                 <p className="text-slate-500 text-sm">
                     You haven&apos;t placed any orders yet, or your session has been cleared.
                 </p>
                 <Link
                     href="/customer/dashboard"
-                    className="inline-flex items-center gap-2 mt-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 transition"
+                    className="inline-flex items-center gap-2 mt-4 rounded-xl bg-errand-leaf hover:bg-errand-leaf text-white font-bold px-6 py-3 transition"
                 >
                     🛒 Place Your First Order
                 </Link>
@@ -224,7 +224,7 @@ export default function CustomerOrdersPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                    <h1 className="text-2xl font-extrabold text-slate-900">
+                    <h1 className="text-2xl font-extrabold text-errand-obsidian">
                         {customerName ? `${customerName}'s Orders` : 'My Orders'}
                     </h1>
                     <p className="mt-0.5 text-sm text-slate-500">
@@ -233,7 +233,7 @@ export default function CustomerOrdersPage() {
                 </div>
                 <Link
                     href="/customer/dashboard"
-                    className="self-start sm:self-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
+                    className="self-start sm:self-center rounded-xl border border-slate-200 bg-errand-alabaster px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-errand-alabaster transition"
                 >
                     + Place New Order
                 </Link>
@@ -244,13 +244,13 @@ export default function CustomerOrdersPage() {
                     {[1, 2].map((i) => <div key={i} className="h-48 rounded-2xl bg-slate-200" />)}
                 </div>
             ) : orders.length === 0 ? (
-                <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center space-y-3">
+                <div className="rounded-2xl border border-slate-200 bg-errand-alabaster p-12 text-center space-y-3">
                     <div className="text-4xl">🧺</div>
                     <p className="font-semibold text-slate-700">No orders yet for your account.</p>
                     <p className="text-sm text-slate-400">Orders you place will appear here with live status updates.</p>
                     <Link
                         href="/customer/dashboard"
-                        className="inline-block mt-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2.5 text-sm transition"
+                        className="inline-block mt-2 rounded-xl bg-errand-leaf hover:bg-errand-leaf text-white font-bold px-5 py-2.5 text-sm transition"
                     >
                         Start Shopping
                     </Link>
@@ -265,7 +265,7 @@ export default function CustomerOrdersPage() {
                         return (
                             <div
                                 key={eid}
-                                className={`rounded-2xl border bg-white shadow-sm overflow-hidden ${
+                                className={`rounded-2xl border bg-errand-alabaster shadow-sm overflow-hidden ${
                                     order.status === 'cancelled' ? 'border-rose-200 opacity-70' : 'border-slate-200'
                                 }`}
                             >
@@ -275,7 +275,7 @@ export default function CustomerOrdersPage() {
                                         <p className="text-[10px] uppercase tracking-widest text-slate-400">
                                             Order from {new Date(order.createdAt).toLocaleDateString('en-GH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                         </p>
-                                        <h2 className="mt-1 text-lg font-bold text-slate-900">{order.marketName}</h2>
+                                        <h2 className="mt-1 text-lg font-bold text-errand-obsidian">{order.marketName}</h2>
                                         <p className="text-sm text-slate-500 mt-0.5">
                                             Payout: <span className="font-semibold text-slate-800">₵{order.payout}</span>
                                             {order.paymentMethod && (
@@ -303,7 +303,7 @@ export default function CustomerOrdersPage() {
 
                                 {/* Rider Update */}
                                 {order.riderMessage && order.status !== 'paid_editable' && (
-                                    <div className="mx-5 mb-4 rounded-xl bg-slate-50 border border-slate-100 px-4 py-3">
+                                    <div className="mx-5 mb-4 rounded-xl bg-errand-alabaster border border-slate-100 px-4 py-3">
                                         <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">
                                             {order.riderName ? `🏍️ ${order.riderName} says:` : 'Rider Update'}
                                         </p>
@@ -326,7 +326,7 @@ export default function CustomerOrdersPage() {
                                         {order.items.map((item, idx) => (
                                             <li
                                                 key={idx}
-                                                className="flex items-center justify-between rounded-xl bg-slate-50 border border-slate-100 px-3 py-2 text-sm"
+                                                className="flex items-center justify-between rounded-xl bg-errand-alabaster border border-slate-100 px-3 py-2 text-sm"
                                             >
                                                 <span className="text-slate-700">
                                                     <span className="font-semibold">{item.quantity || item.qty || 1}×</span>{' '}
@@ -357,12 +357,12 @@ export default function CustomerOrdersPage() {
                                                 value={newItemName}
                                                 onChange={(e) => setNewItemName(e.target.value)}
                                                 placeholder="Add another item…"
-                                                className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-emerald-600"
+                                                className="flex-1 rounded-xl border border-slate-200 bg-errand-alabaster px-3 py-2 text-sm focus:outline-emerald-600"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => handleAddItem(order)}
-                                                className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-500 transition whitespace-nowrap"
+                                                className="rounded-xl bg-errand-leaf px-4 py-2 text-sm font-bold text-white hover:bg-errand-leaf transition whitespace-nowrap"
                                             >
                                                 Add
                                             </button>
@@ -374,20 +374,20 @@ export default function CustomerOrdersPage() {
                                 {order.status === 'paid_editable' && (
                                     <div className={`mx-5 mb-5 rounded-xl px-4 py-3 flex items-center justify-between ${
                                         secs > 0
-                                            ? 'bg-amber-50 border border-amber-200'
+                                            ? 'bg-errand-ochre border border-errand-ochre'
                                             : 'bg-slate-100 border border-slate-200'
                                     }`}>
                                         {secs > 0 ? (
                                             <>
                                                 <div>
-                                                    <p className="text-xs font-bold text-amber-800">
+                                                    <p className="text-xs font-bold text-errand-ochre">
                                                         ✏️ Edit window closes in {timeStr}
                                                     </p>
-                                                    <p className="text-[10px] text-amber-600 mt-0.5">
+                                                    <p className="text-[10px] text-errand-ochre mt-0.5">
                                                         You can still add or remove items
                                                     </p>
                                                 </div>
-                                                <div className="text-2xl font-black text-amber-500 tabular-nums">{timeStr}</div>
+                                                <div className="text-2xl font-black text-errand-ochre tabular-nums">{timeStr}</div>
                                             </>
                                         ) : (
                                             <p className="text-xs font-bold text-slate-500">

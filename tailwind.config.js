@@ -7,7 +7,15 @@ export default {
     ],
     darkMode: false,
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                'errand-obsidian': '#131616',
+                'errand-leaf': '#1E4631',
+                'errand-clay': '#C05C3E',
+                'errand-ochre': '#E3A845',
+                'errand-alabaster': '#FAF8F5',
+            }
+        },
     },
     plugins: [],
 };
