@@ -12,7 +12,7 @@ export default {
                 'errand-obsidian': '#131616',
                 'errand-leaf': '#1E4631',
                 'errand-clay': '#C05C3E',
-                'errand-ochre': '#E3A845',
+                'errand-ochre': '#C4B5FD', // Faint purple instead of orange
                 'errand-alabaster': '#FAF8F5',
             }
         },

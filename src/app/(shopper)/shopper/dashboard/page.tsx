@@ -42,6 +42,7 @@ export default function ShopperDashboardPage() {
     const [poolErrands, setPoolErrands] = useState<any[]>([]);
     const [historyErrands, setHistoryErrands] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [customUpdateMessage, setCustomUpdateMessage] = useState("");
 
     useEffect(() => {
         setIsClient(true);
@@ -57,7 +58,7 @@ export default function ShopperDashboardPage() {
     // Submit profile details handler (New Shopper)
     const handleOnboardingSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!fullName || !phoneNumber || !idNumber) {
+        if (!fullName || !phoneNumber) {
             alert("Please fill in all verification fields.");
             return;
         }
@@ -165,6 +166,38 @@ export default function ShopperDashboardPage() {
         setErrandState("pool");
     };
 
+    const handleCancelErrand = async () => {
+        if (!activeErrand) return;
+        const errandId = activeErrand._id || activeErrand.id;
+        try {
+            await fetch('/api/errands', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: errandId,
+                    status: "paid_editable",
+                    riderId: null,
+                    riderName: null,
+                    riderMessage: "Shopper cancelled the request and returned it to the pool."
+                })
+            });
+            setActiveErrand(null);
+            setErrandState("pool");
+            loadErrands();
+        } catch (e) {
+            console.error('Failed to cancel errand:', e);
+        }
+    };
+
+    const handleSendCustomUpdate = async () => {
+        if (!activeErrand || !customUpdateMessage.trim()) return;
+        await updateErrandAPI(errandState, {
+            riderMessage: customUpdateMessage
+        });
+        setCustomUpdateMessage("");
+        alert("Customer notified!");
+    };
+
     const loadErrands = async () => {
         if (shopperStatus !== "verified") return;
         try {
@@ -178,7 +211,20 @@ export default function ShopperDashboardPage() {
             const historyRes = await fetch(historyUrl);
             const historyResult = await historyRes.json();
             if (historyRes.ok && historyResult?.success) {
-                setHistoryErrands(Array.isArray(historyResult.data) ? historyResult.data : []);
+                const historyData = Array.isArray(historyResult.data) ? historyResult.data : [];
+                setHistoryErrands(historyData);
+
+                // Auto-restore active errand if shopper refreshed the page
+                setErrandState(currentErrandState => {
+                    if (currentErrandState === "pool") {
+                        const active = historyData.find(e => ['accepted', 'shopping', 'delivering'].includes(e.status));
+                        if (active) {
+                            setActiveErrand(active);
+                            return active.status as any;
+                        }
+                    }
+                    return currentErrandState;
+                });
             }
         } catch (error) {
             console.error("Failed to load errands:", error);
@@ -216,7 +262,7 @@ export default function ShopperDashboardPage() {
                     <div className="mt-3 sm:mt-0 self-start sm:self-center flex items-center space-x-2">
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Profile:</span>
                         {shopperStatus === "unregistered" && (
-                            <span className="text-xs font-black bg-red-100 text-errand-clay px-3 py-1 rounded-full border border-red-200"> Unverified Gate</span>
+                            <span className="text-xs font-black bg-purple-100 text-purple-700 px-3 py-1 rounded-full border border-purple-200"> Unverified</span>
                         )}
                         {shopperStatus === "login" && (
                             <span className="text-xs font-black bg-blue-100 text-errand-clay px-3 py-1 rounded-full border border-blue-200"> Login Required</span>
@@ -225,7 +271,7 @@ export default function ShopperDashboardPage() {
                             <span className="text-xs font-black bg-errand-ochre text-errand-ochre px-3 py-1 rounded-full border border-errand-ochre animate-pulse">⏳ Under Review</span>
                         )}
                         {shopperStatus === "verified" && (
-                            <span className="text-xs font-black bg-errand-leaf text-errand-leaf px-3 py-1 rounded-full border border-errand-leaf">✅ Authorized Sourcing Agent</span>
+                            <span className="text-xs font-black bg-errand-leaf text-white px-3 py-1 rounded-full border border-errand-leaf">✅ Authorized Sourcing Agent</span>
                         )}
                     </div>
                 </header>
@@ -303,11 +349,11 @@ export default function ShopperDashboardPage() {
            ========================================================= */}
                 {shopperStatus === "unregistered" && (
                     <div className="bg-errand-alabaster rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
-                        <div className="bg-gradient-to-r from-red-500 to-orange-500 p-5 text-white flex items-center space-x-3">
-                            <ShieldAlert className="w-6 h-6 shrink-0" />
+                        <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-5 text-purple-900 flex items-center space-x-3">
+                            <ShieldAlert className="w-6 h-6 shrink-0 text-purple-700" />
                             <div>
-                                <h2 className="font-extrabold text-base">Verification Required</h2>
-                                <p className="text-xs text-red-50 text-slate-100">To maintain safety and trust, complete verification to unlock live errands.</p>
+                                <h2 className="font-extrabold text-base text-purple-900">Verification Required</h2>
+                                <p className="text-xs text-purple-800">To maintain safety and trust, complete verification to unlock live errands.</p>
                             </div>
                         </div>
 
@@ -359,20 +405,7 @@ export default function ShopperDashboardPage() {
                                     </select>
                                 </div>
 
-                                <div>
-                                    <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5 flex items-center space-x-1">
-                                        <CreditCard className="w-3.5 h-3.5 text-slate-400" />
-                                        <span>Unique ID Number</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={idNumber}
-                                        onChange={(e) => setIdNumber(e.target.value)}
-                                        placeholder="e.g. GHA-72910839-4"
-                                        className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:border-slate-900 focus:outline-none transition bg-errand-alabaster"
-                                    />
-                                </div>
+                                {/* Removed Unique ID Number field for test mode */}
 
                                 <div className="md:col-span-2">
                                     <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5 flex items-center space-x-1">
@@ -407,7 +440,7 @@ export default function ShopperDashboardPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShopperStatus("login")}
-                                    className="px-6 bg-errand-alabaster border-2 border-slate-200 hover:border-slate-300 text-slate-600 text-xs font-extrabold uppercase tracking-wider py-4 rounded-xl transition shadow-sm"
+                                    className="flex-1 bg-slate-200 border-2 border-slate-300 hover:bg-slate-300 hover:border-slate-400 text-slate-800 text-xs font-extrabold uppercase tracking-wider py-4 rounded-xl transition shadow-sm"
                                 >
                                     Login Instead
                                 </button>
@@ -499,6 +532,13 @@ export default function ShopperDashboardPage() {
                                                             <span className="font-extrabold text-errand-obsidian">{item.quantity || item.qty}x {item.name}</span>
                                                             {item.condition && <span className="block text-[11px] text-slate-500 italic mt-0.5">⚠️ Condition: {item.condition}</span>}
                                                             {item.notes && <span className="block text-[11px] text-slate-500 italic mt-0.5">⚠️ Notes: {item.notes}</span>}
+                                                            {item.imageUrls && item.imageUrls.length > 0 && (
+                                                                <div className="flex gap-2 mt-2">
+                                                                    {item.imageUrls.map((url: string, i: number) => (
+                                                                        <img key={i} src={url} alt={`Ref ${i}`} className="w-12 h-12 object-cover rounded-lg border border-slate-200 shadow-sm" />
+                                                                    ))}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </li>
                                                 ))}
@@ -584,12 +624,21 @@ export default function ShopperDashboardPage() {
 
                                                     <div className="space-y-2 mt-3">
                                                         {activeErrand.items.map((item: any, idx: number) => (
-                                                            <div key={idx} className="bg-errand-alabaster p-3 rounded-xl border border-slate-100 flex items-center justify-between text-xs">
-                                                                <div>
-                                                                    <span className="font-extrabold text-errand-obsidian">{item.qty}x {item.name}</span>
-                                                                    <span className="block text-[10px] text-slate-400 italic">Check: {item.condition}</span>
+                                                            <div key={idx} className="bg-errand-alabaster p-3 rounded-xl border border-slate-100 flex flex-col gap-2 text-xs">
+                                                                <div className="flex items-center justify-between">
+                                                                    <div>
+                                                                        <span className="font-extrabold text-errand-obsidian">{item.qty || item.quantity}x {item.name}</span>
+                                                                        <span className="block text-[10px] text-slate-400 italic">Check: {item.condition || "As requested"}</span>
+                                                                    </div>
+                                                                    <span className="text-[10px] bg-errand-leaf text-white font-bold px-2 py-0.5 rounded-full shrink-0">Approved</span>
                                                                 </div>
-                                                                <span className="text-[10px] bg-errand-leaf text-errand-leaf font-bold px-2 py-0.5 rounded-full">Approved</span>
+                                                                {item.imageUrls && item.imageUrls.length > 0 && (
+                                                                    <div className="flex gap-2">
+                                                                        {item.imageUrls.map((url: string, i: number) => (
+                                                                            <img key={i} src={url} alt={`Ref ${i}`} className="w-12 h-12 object-cover rounded-lg border border-slate-200 shadow-sm" />
+                                                                        ))}
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         ))}
                                                     </div>
@@ -630,17 +679,50 @@ export default function ShopperDashboardPage() {
                                         {/* STEP D: COMPLETED */}
                                         {errandState === "completed" && (
                                             <div className="p-4 bg-errand-leaf border border-errand-leaf rounded-xl text-center space-y-2">
-                                                <div className="w-8 h-8 rounded-full bg-errand-leaf flex items-center justify-center mx-auto text-errand-leaf">
+                                                <div className="w-8 h-8 rounded-full bg-errand-leaf flex items-center justify-center mx-auto text-white">
                                                     <CheckCircle className="w-4 h-4" />
                                                 </div>
-                                                <h4 className="font-extrabold text-xs text-errand-leaf uppercase tracking-wider">Run Completed Successfully!</h4>
-                                                <p className="text-[11px] text-errand-leaf">Earnings have been credited.</p>
+                                                <h4 className="font-extrabold text-xs text-white uppercase tracking-wider">Run Completed Successfully!</h4>
+                                                <p className="text-[11px] text-white">Earnings have been credited.</p>
                                                 <button
                                                     onClick={handleClearErrandRun}
                                                     className="text-xs font-bold text-slate-600 bg-errand-alabaster border border-slate-200 rounded-lg px-3 py-1.5 mt-2 hover:bg-errand-alabaster"
                                                 >
                                                     Clear Route Pipeline
                                                 </button>
+                                            </div>
+                                        )}
+
+                                        {/* CUSTOMER UPDATE & CANCEL OPTIONS */}
+                                        {errandState !== "completed" && (
+                                            <div className="pt-4 border-t border-slate-200 space-y-4">
+                                                <div className="bg-white p-4 rounded-xl border border-slate-200">
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-2">Send Custom Update to Customer</label>
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="e.g. Traffic is heavy, I'll be 5 mins late..."
+                                                            value={customUpdateMessage}
+                                                            onChange={(e) => setCustomUpdateMessage(e.target.value)}
+                                                            className="flex-1 text-xs border border-slate-200 rounded-lg p-2.5 outline-none focus:border-errand-leaf"
+                                                        />
+                                                        <button
+                                                            onClick={handleSendCustomUpdate}
+                                                            disabled={!customUpdateMessage.trim()}
+                                                            className="bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold px-4 py-2.5 rounded-lg transition"
+                                                        >
+                                                            Send
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <button
+                                                        onClick={handleCancelErrand}
+                                                        className="text-[11px] font-bold text-red-500 hover:text-red-700 underline"
+                                                    >
+                                                        Cancel & Release Errand
+                                                    </button>
+                                                </div>
                                             </div>
                                         )}
 

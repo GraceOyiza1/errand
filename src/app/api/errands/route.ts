@@ -91,10 +91,10 @@ export async function PATCH(request: Request) {
         // Prepare dynamic update payload
         const updateData: any = { status };
 
-        if (riderId) updateData.riderId = riderId;
-        if (riderName) updateData.riderName = riderName;
+        if (riderId !== undefined) updateData.riderId = riderId;
+        if (riderName !== undefined) updateData.riderName = riderName;
         if (etaMinutes !== undefined) updateData.estDeliveryTime = etaMinutes;
-        if (riderMessage) updateData.riderMessage = riderMessage;
+        if (riderMessage !== undefined) updateData.riderMessage = riderMessage;
 
         // Convert string ID to MongoDB ObjectId safely
         let queryId;

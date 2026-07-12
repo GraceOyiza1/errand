@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import ImageUploader from "@/components/ImageUploader";
+import { usePaystackPayment } from "react-paystack";
 
 interface Market {
   id: string;
@@ -263,50 +264,33 @@ export default function CustomerDashboard() {
     setItems(items.filter((item) => item.id !== id));
   };
 
-  const handleCheckout = async (e?: React.FormEvent) => {
-    if (e && e.preventDefault) e.preventDefault();
-    if (isCheckingOut) return;
+  // Math calculation 
+  const itemsSubtotal = items.reduce(
+    (sum, item) => sum + item.targetPrice * item.quantity,
+    0,
+  );
 
-    if (!customerName.trim() || !customerPhone.trim()) {
-      setCheckoutMessage("Please enter your name and phone number in step 1.");
-      return;
-    }
+  // We add a higher protection buffer specifically for unlisted open market custom items
+  const marketBuffer = items.reduce((sum, item) => {
+    const itemCost = item.targetPrice * item.quantity;
+    return sum + (item.isCustom ? itemCost * 0.33 : itemCost * 0.12);
+  }, 0);
 
-    if (items.length === 0 || !selectedMarket) {
-      setCheckoutMessage(
-        "Please add at least one item and choose a market before checking out.",
-      );
-      return;
-    }
+  const deliveryFee = selectedMarket ? selectedMarket.baseDeliveryFee : 0;
+  const grandTotal = itemsSubtotal + marketBuffer + deliveryFee;
 
-    const savedOrders =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem("errand-demo-orders")
-        : null;
-    const existingOrders = savedOrders ? JSON.parse(savedOrders) : [];
-    const duplicateOrder = existingOrders.find(
-      (order: { marketName: string; items: ShoppingItem[] }) =>
-        order.marketName === selectedMarket.name &&
-        JSON.stringify(order.items) ===
-        JSON.stringify(
-          items.map((item) => ({
-            name: item.name,
-            quantity: item.quantity,
-            unit: item.unit,
-            notes: item.notes,
-          })),
-        ),
-    );
+  const paystackConfig = {
+    reference: new Date().getTime().toString() + Math.floor(Math.random() * 1000000000).toString(),
+    email: customerPhone ? `${customerPhone.replace(/\s+/g, "")}@errand.com` : "user@errand.com",
+    amount: Math.round(grandTotal * 100), // in Pesewas (Ghanaian cedi)
+    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_TEST_PUBLIC_KEY || "pk_test_f13bd5c684131636c8030a7b859f15b2cdc85ed2",
+    currency: "GHS",
+  };
 
-    if (duplicateOrder) {
-      setCheckoutMessage(
-        "This order has already been submitted once. Check your orders page for the latest status.",
-      );
-      return;
-    }
+  const initializePayment = usePaystackPayment(paystackConfig);
 
-    setIsCheckingOut(true);
-    setCheckoutMessage("Processing checkout...");
+  const processOrder = async () => {
+    if (!selectedMarket) return;
 
     // Derive a stable customerId from the phone number
     const customerId = `customer_${customerPhone.trim().replace(/\s+/g, "")}`;
@@ -379,20 +363,67 @@ export default function CustomerDashboard() {
     }
   };
 
-  // Math calculation 
-  const itemsSubtotal = items.reduce(
-    (sum, item) => sum + item.targetPrice * item.quantity,
-    0,
-  );
+  const handleCheckout = async (e?: React.FormEvent) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (isCheckingOut) return;
 
-  // We add a higher protection buffer specifically for unlisted open market custom items
-  const marketBuffer = items.reduce((sum, item) => {
-    const itemCost = item.targetPrice * item.quantity;
-    return sum + (item.isCustom ? itemCost * 0.33 : itemCost * 0.12);
-  }, 0);
+    if (!customerName.trim() || !customerPhone.trim()) {
+      setCheckoutMessage("Please enter your name and phone number in step 1.");
+      return;
+    }
 
-  const deliveryFee = selectedMarket ? selectedMarket.baseDeliveryFee : 0;
-  const grandTotal = itemsSubtotal + marketBuffer + deliveryFee;
+    if (items.length === 0 || !selectedMarket) {
+      setCheckoutMessage(
+        "Please add at least one item and choose a market before checking out.",
+      );
+      return;
+    }
+
+    const savedOrders =
+      typeof window !== "undefined"
+        ? window.localStorage.getItem("errand-demo-orders")
+        : null;
+    const existingOrders = savedOrders ? JSON.parse(savedOrders) : [];
+    const duplicateOrder = existingOrders.find(
+      (order: { marketName: string; items: ShoppingItem[] }) =>
+        order.marketName === selectedMarket.name &&
+        JSON.stringify(order.items) ===
+        JSON.stringify(
+          items.map((item) => ({
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            notes: item.notes,
+          })),
+        ),
+    );
+
+    if (duplicateOrder) {
+      setCheckoutMessage(
+        "This order has already been submitted once. Check your orders page for the latest status.",
+      );
+      return;
+    }
+
+    setIsCheckingOut(true);
+
+    if (selectedPaymentMethod === "mobile-money") {
+      setCheckoutMessage("Initializing Paystack payment...");
+      initializePayment({
+        onSuccess: () => {
+          setCheckoutMessage("Payment successful! Processing order...");
+          processOrder();
+        },
+        onClose: () => {
+          setIsCheckingOut(false);
+          setCheckoutMessage("Payment window closed.");
+        }
+      });
+    } else {
+      setCheckoutMessage("Processing checkout...");
+      processOrder();
+    }
+  };
 
   return (
     <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300">
@@ -461,7 +492,7 @@ export default function CustomerDashboard() {
                 Request a New Errand
               </h1>
               <p className="text-slate-500 mt-1 sm:mt-2 text-sm sm:text-base">
-                Select the market where our shopper should buy your commodities.
+                Select the market where our shopper should buy your Groceries.
               </p>
             </div>
             <button
@@ -594,7 +625,7 @@ export default function CustomerDashboard() {
                         </label>
                         <input
                           type="number"
-                          placeholder="15"
+                          placeholder="10"
                           value={customTargetPrice}
                           onChange={(e) => setCustomTargetPrice(e.target.value)}
                           className="w-full text-sm text-errand-obsidian border p-2.5 rounded-xl bg-errand-alabaster focus:outline-emerald-600 placeholder:text-slate-400"
@@ -606,7 +637,7 @@ export default function CustomerDashboard() {
                         </label>
                         <input
                           type="text"
-                          placeholder="e.g. 2 wraps, cups"
+                          placeholder="e.g. 2 pieces, cups"
                           value={customUnit}
                           onChange={(e) => setCustomUnit(e.target.value)}
                           className="w-full text-sm text-errand-obsidian border p-2.5 rounded-xl bg-errand-alabaster focus:outline-emerald-600 placeholder:text-slate-400"
@@ -634,7 +665,7 @@ export default function CustomerDashboard() {
                     Instructions for Rider
                   </label>
                   <textarea
-                    placeholder="e.g., If the ₵15 package is too small, contact customer."
+                    placeholder="e.g., If the ₵10 package is too small, contact customer."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     className="w-full text-sm text-errand-obsidian border p-2.5 rounded-xl bg-errand-alabaster focus:outline-emerald-600 placeholder:text-slate-400 h-20 resize-none"
@@ -802,7 +833,7 @@ export default function CustomerDashboard() {
                     <p>
                       3. <span className="underline">Important:</span> If you do
                       not reply to the shopper's notification before they
-                      checkout at the stall, the item will be automatically
+                      checkout at the store, the item will be automatically
                       removed from your run and a full refund for that specific
                       item will be disbursed immediately.
                     </p>
@@ -892,10 +923,10 @@ export default function CustomerDashboard() {
                           <div>
                             <p className="text-xs font-bold text-errand-ochre">
                               Order locks in {Math.floor(timeLeft / 60)}:
-                              {(timeLeft % 60).toString().padStart(2, "0")}
+                              {(timeLeft % 60).toString().padStart(5, "0")}
                             </p>
                             <p className="text-[10px] text-errand-ochre mt-0.5">
-                              You have 3 minutes to change items
+                              You have 5 minutes to change items
                             </p>
                           </div>
                           <button
@@ -911,7 +942,7 @@ export default function CustomerDashboard() {
                             Order Locked
                           </p>
                           <p className="text-[10px] text-slate-400 mt-0.5">
-                            The 3-minute modification window has passed.
+                            The 5-minute modification window has passed.
                           </p>
                         </div>
                       ) : null}

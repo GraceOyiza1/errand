@@ -33,11 +33,11 @@ interface Errand {
 
 const STATUS_STEPS = [
     { key: 'paid_editable', label: 'Order Placed', icon: '📋', color: 'text-errand-clay' },
-    { key: 'locked',        label: 'Locked & Open', icon: '🔒', color: 'text-errand-ochre' },
-    { key: 'accepted',      label: 'Shopper Assigned', icon: '🤝', color: 'text-purple-600' },
-    { key: 'shopping',      label: 'Shopping Now', icon: '🛒', color: 'text-errand-ochre' },
-    { key: 'delivering',    label: 'On The Way', icon: '🏍️', color: 'text-errand-clay' },
-    { key: 'completed',     label: 'Delivered!', icon: '✅', color: 'text-errand-leaf' },
+    { key: 'locked', label: 'Locked & Open', icon: '🔒', color: 'text-errand-ochre' },
+    { key: 'accepted', label: 'Shopper Assigned', icon: '🤝', color: 'text-purple-600' },
+    { key: 'shopping', label: 'Shopping Now', icon: '🛒', color: 'text-errand-ochre' },
+    { key: 'delivering', label: 'On The Way', icon: '🏍️', color: 'text-errand-clay' },
+    { key: 'completed', label: 'Delivered!', icon: '✅', color: 'text-errand-leaf' },
 ];
 
 const STATUS_INDEX: Record<string, number> = {
@@ -62,29 +62,26 @@ function StatusTimeline({ status }: { status: string }) {
                         <div key={step.key} className="flex items-center">
                             <div className="flex flex-col items-center">
                                 <div
-                                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
-                                        done
-                                            ? 'bg-errand-leaf border-errand-leaf text-white'
-                                            : active
+                                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${done
+                                        ? 'bg-errand-leaf border-errand-leaf text-white'
+                                        : active
                                             ? 'bg-errand-alabaster border-errand-leaf text-errand-leaf shadow-md scale-110'
                                             : 'bg-slate-100 border-slate-200 text-slate-400'
-                                    }`}
+                                        }`}
                                 >
                                     {done ? '✓' : step.icon}
                                 </div>
                                 <p
-                                    className={`mt-1 text-[9px] font-semibold text-center max-w-[56px] leading-tight ${
-                                        active ? 'text-errand-leaf' : done ? 'text-slate-600' : 'text-slate-400'
-                                    }`}
+                                    className={`mt-1 text-[9px] font-semibold text-center max-w-[56px] leading-tight ${active ? 'text-errand-leaf' : done ? 'text-slate-600' : 'text-slate-400'
+                                        }`}
                                 >
                                     {step.label}
                                 </p>
                             </div>
                             {idx < STATUS_STEPS.length - 1 && (
                                 <div
-                                    className={`h-0.5 w-8 mx-1 rounded-full transition-all ${
-                                        idx < currentIdx ? 'bg-errand-leaf' : 'bg-slate-200'
-                                    }`}
+                                    className={`h-0.5 w-8 mx-1 rounded-full transition-all ${idx < currentIdx ? 'bg-errand-leaf' : 'bg-slate-200'
+                                        }`}
                                 />
                             )}
                         </div>
@@ -192,11 +189,11 @@ export default function CustomerOrdersPage() {
 
     const statusBadge: Record<string, string> = {
         paid_editable: 'bg-blue-100 text-errand-clay',
-        locked: 'bg-errand-ochre text-errand-ochre',
+        locked: 'bg-errand-ochre text-white',
         accepted: 'bg-purple-100 text-purple-700',
-        shopping: 'bg-errand-ochre text-errand-ochre',
+        shopping: 'bg-errand-ochre text-white',
         delivering: 'bg-indigo-100 text-errand-clay',
-        completed: 'bg-errand-leaf text-errand-leaf',
+        completed: 'bg-errand-leaf text-white',
         cancelled: 'bg-rose-100 text-rose-600',
     };
 
@@ -228,7 +225,7 @@ export default function CustomerOrdersPage() {
                         {customerName ? `${customerName}'s Orders` : 'My Orders'}
                     </h1>
                     <p className="mt-0.5 text-sm text-slate-500">
-                        Live updates every 4 seconds · {orders.length} order{orders.length !== 1 ? 's' : ''} found
+                        Real-Time updates every 4 seconds · {orders.length} order{orders.length !== 1 ? 's' : ''} found
                     </p>
                 </div>
                 <Link
@@ -247,7 +244,7 @@ export default function CustomerOrdersPage() {
                 <div className="rounded-2xl border border-slate-200 bg-errand-alabaster p-12 text-center space-y-3">
                     <div className="text-4xl">🧺</div>
                     <p className="font-semibold text-slate-700">No orders yet for your account.</p>
-                    <p className="text-sm text-slate-400">Orders you place will appear here with live status updates.</p>
+                    <p className="text-sm text-slate-400">Orders you place will appear here on Real-Time.</p>
                     <Link
                         href="/customer/dashboard"
                         className="inline-block mt-2 rounded-xl bg-errand-leaf hover:bg-errand-leaf text-white font-bold px-5 py-2.5 text-sm transition"
@@ -265,9 +262,8 @@ export default function CustomerOrdersPage() {
                         return (
                             <div
                                 key={eid}
-                                className={`rounded-2xl border bg-errand-alabaster shadow-sm overflow-hidden ${
-                                    order.status === 'cancelled' ? 'border-rose-200 opacity-70' : 'border-slate-200'
-                                }`}
+                                className={`rounded-2xl border bg-errand-alabaster shadow-sm overflow-hidden ${order.status === 'cancelled' ? 'border-rose-200 opacity-70' : 'border-slate-200'
+                                    }`}
                             >
                                 {/* Card Header */}
                                 <div className="flex items-start justify-between gap-3 p-5 pb-3">
@@ -372,11 +368,10 @@ export default function CustomerOrdersPage() {
 
                                 {/* Edit window banner */}
                                 {order.status === 'paid_editable' && (
-                                    <div className={`mx-5 mb-5 rounded-xl px-4 py-3 flex items-center justify-between ${
-                                        secs > 0
-                                            ? 'bg-errand-ochre border border-errand-ochre'
-                                            : 'bg-slate-100 border border-slate-200'
-                                    }`}>
+                                    <div className={`mx-5 mb-5 rounded-xl px-4 py-3 flex items-center justify-between ${secs > 0
+                                        ? 'bg-errand-ochre border border-errand-ochre'
+                                        : 'bg-slate-100 border border-slate-200'
+                                        }`}>
                                         {secs > 0 ? (
                                             <>
                                                 <div>
