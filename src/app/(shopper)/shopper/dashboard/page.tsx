@@ -217,7 +217,7 @@ export default function ShopperDashboardPage() {
                 // Auto-restore active errand if shopper refreshed the page
                 setErrandState(currentErrandState => {
                     if (currentErrandState === "pool") {
-                        const active = historyData.find(e => ['accepted', 'shopping', 'delivering'].includes(e.status));
+                        const active = historyData.find((e: any) => ['accepted', 'shopping', 'delivering'].includes(e.status));
                         if (active) {
                             setActiveErrand(active);
                             return active.status as any;
