@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import ImageUploader from "@/components/ImageUploader";
-import { usePaystackPayment } from "react-paystack";
+import dynamic from "next/dynamic";
+
+const PaystackIntegration = dynamic(() => import("@/components/PaystackIntegration"), { ssr: false });
 
 interface Market {
   id: string;
@@ -128,6 +130,7 @@ export default function CustomerDashboard() {
   const [customUnit, setCustomUnit] = useState("wrap/packet");
   const [notes, setNotes] = useState("");
   const [itemImages, setItemImages] = useState<string[]>([]);
+  const [triggerPaystack, setTriggerPaystack] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -287,8 +290,6 @@ export default function CustomerDashboard() {
     currency: "GHS",
   };
 
-  const initializePayment = usePaystackPayment(paystackConfig);
-
   const processOrder = async () => {
     if (!selectedMarket) return;
 
@@ -409,16 +410,7 @@ export default function CustomerDashboard() {
 
     if (selectedPaymentMethod === "mobile-money") {
       setCheckoutMessage("Initializing Paystack payment...");
-      initializePayment({
-        onSuccess: () => {
-          setCheckoutMessage("Payment successful! Processing order...");
-          processOrder();
-        },
-        onClose: () => {
-          setIsCheckingOut(false);
-          setCheckoutMessage("Payment window closed.");
-        }
-      });
+      setTriggerPaystack(true);
     } else {
       setCheckoutMessage("Processing checkout...");
       processOrder();
@@ -427,6 +419,20 @@ export default function CustomerDashboard() {
 
   return (
     <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300">
+      <PaystackIntegration 
+        config={paystackConfig} 
+        trigger={triggerPaystack} 
+        onSuccess={() => {
+          setTriggerPaystack(false);
+          setCheckoutMessage("Payment successful! Processing order...");
+          processOrder();
+        }}
+        onClose={() => {
+          setTriggerPaystack(false);
+          setIsCheckingOut(false);
+          setCheckoutMessage("Payment window closed.");
+        }} 
+      />
       {step === 0 && (
         <div className="space-y-6 sm:space-y-8 w-full mt-6 sm:mt-10">
           <div className="text-center max-w-4xl mx-auto">
