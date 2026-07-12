@@ -348,17 +348,17 @@ export default function CustomerOrdersPage() {
 
                                     {/* Add item during editable window */}
                                     {editable && (
-                                        <div className="mt-3 flex gap-2">
+                                        <div className="mt-3 flex flex-col sm:flex-row gap-2">
                                             <input
                                                 value={newItemName}
                                                 onChange={(e) => setNewItemName(e.target.value)}
                                                 placeholder="Add another item…"
-                                                className="flex-1 rounded-xl border border-slate-200 bg-errand-alabaster px-3 py-2 text-sm focus:outline-emerald-600"
+                                                className="flex-1 w-full rounded-xl border border-slate-200 bg-errand-alabaster px-3 py-2 text-sm focus:outline-emerald-600"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => handleAddItem(order)}
-                                                className="rounded-xl bg-errand-leaf px-4 py-2 text-sm font-bold text-white hover:bg-errand-leaf transition whitespace-nowrap"
+                                                className="w-full sm:w-auto rounded-xl bg-errand-leaf px-4 py-2 text-sm font-bold text-white hover:bg-errand-leaf transition whitespace-nowrap"
                                             >
                                                 Add
                                             </button>

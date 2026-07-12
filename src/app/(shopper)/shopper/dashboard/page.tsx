@@ -412,7 +412,7 @@ export default function ShopperDashboardPage() {
                                         <Bike className="w-3.5 h-3.5 text-slate-400" />
                                         <span>Logistics / Transport Mode</span>
                                     </label>
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                         {["Motorcycle", "Bicycle", "On Foot / Walking"].map((mode) => (
                                             <button
                                                 key={mode}
@@ -430,17 +430,17 @@ export default function ShopperDashboardPage() {
                                 </div>
                             </div>
 
-                            <div className="pt-4 border-t border-slate-100 flex gap-4">
+                            <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
                                 <button
                                     type="submit"
-                                    className="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold uppercase tracking-wider py-4 rounded-xl transition shadow-lg"
+                                    className="flex-1 w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold uppercase tracking-wider py-4 rounded-xl transition shadow-lg"
                                 >
                                     Submit
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setShopperStatus("login")}
-                                    className="flex-1 bg-slate-200 border-2 border-slate-300 hover:bg-slate-300 hover:border-slate-400 text-slate-800 text-xs font-extrabold uppercase tracking-wider py-4 rounded-xl transition shadow-sm"
+                                    className="flex-1 w-full bg-slate-200 border-2 border-slate-300 hover:bg-slate-300 hover:border-slate-400 text-slate-800 text-xs font-extrabold uppercase tracking-wider py-4 rounded-xl transition shadow-sm"
                                 >
                                     Login Instead
                                 </button>
@@ -582,7 +582,7 @@ export default function ShopperDashboardPage() {
                                                     </p>
                                                 </div>
 
-                                                <div className="grid grid-cols-2 gap-3">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     <div>
                                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Market Shopping (Mins)</label>
                                                         <input
