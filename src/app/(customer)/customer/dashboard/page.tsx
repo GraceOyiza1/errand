@@ -316,7 +316,8 @@ export default function CustomerDashboard() {
           unit: item.unit,
           condition: item.notes,
           notes: item.notes,
-          expectedPrice: item.targetPrice
+          expectedPrice: item.targetPrice,
+          imageUrls: item.imageUrls
         })),
         payout: grandTotal,
         paymentMethod: selectedPaymentMethod,

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import ImageUploader from "@/components/ImageUploader";
 import {
     ShieldAlert,
     User,
@@ -43,6 +44,7 @@ export default function ShopperDashboardPage() {
     const [historyErrands, setHistoryErrands] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [customUpdateMessage, setCustomUpdateMessage] = useState("");
+    const [basketPhoto, setBasketPhoto] = useState<string[]>([]);
 
     useEffect(() => {
         setIsClient(true);
@@ -148,8 +150,13 @@ export default function ShopperDashboardPage() {
     };
 
     const handleCompleteShoppingAndTransit = async () => {
+        if (basketPhoto.length === 0) {
+            alert("Please capture a photo of your basket before dispatching!");
+            return;
+        }
         setErrandState("delivering");
         await updateErrandAPI("delivering", {
+            basketImageUrl: basketPhoto[0],
             riderMessage: "Shopper has completed purchasing and is en route for delivery."
         });
     };
@@ -647,9 +654,19 @@ export default function ShopperDashboardPage() {
                                                 <div className="p-4 border border-slate-200 rounded-xl bg-errand-alabaster text-center space-y-3">
                                                     <span className="text-2xl block">📸</span>
                                                     <h5 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Capture your Basket and send photo</h5>
+                                                    
+                                                    <div className="text-left bg-white p-3 rounded-lg border border-slate-200">
+                                                        <ImageUploader 
+                                                            images={basketPhoto} 
+                                                            onChange={(imgs) => setBasketPhoto(imgs)} 
+                                                            maxImages={1} 
+                                                            label="Basket Photo"
+                                                        />
+                                                    </div>
+
                                                     <button
                                                         onClick={handleCompleteShoppingAndTransit}
-                                                        className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition"
+                                                        className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-3 rounded-lg transition"
                                                     >
                                                         Upload Photo & Dispatch Rider
                                                     </button>

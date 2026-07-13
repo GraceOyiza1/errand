@@ -28,20 +28,51 @@ export default function ImageUploader({
 
         for (const file of pickedFiles) {
             try {
-                const formData = new FormData();
-                formData.append("file", file);
+                const url = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement("canvas");
+                            let width = img.width;
+                            let height = img.height;
+                            const MAX_SIZE = 600;
 
-                const response = await fetch("/api/upload", {
-                    method: "POST",
-                    body: formData,
+                            if (width > height) {
+                                if (width > MAX_SIZE) {
+                                    height *= MAX_SIZE / width;
+                                    width = MAX_SIZE;
+                                }
+                            } else {
+                                if (height > MAX_SIZE) {
+                                    width *= MAX_SIZE / height;
+                                    height = MAX_SIZE;
+                                }
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext("2d");
+                            if (!ctx) return reject("Canvas ctx missing");
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            // Compress aggressively to save localStorage space
+                            const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
+                            resolve(dataUrl);
+                        };
+                        img.onerror = reject;
+                        if (e.target?.result) {
+                            img.src = e.target.result as string;
+                        } else {
+                            reject("FileReader missing result");
+                        }
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
                 });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    uploadedUrls.push(data.url);
-                }
+                uploadedUrls.push(url);
             } catch (error) {
-                console.error("Failed to upload image:", error);
+                console.error("Failed to process image:", error);
             }
         }
 

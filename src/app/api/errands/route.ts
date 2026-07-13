@@ -79,7 +79,7 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
     try {
         const body = await request.json();
-        const { id, status, riderId, riderName, etaMinutes, riderMessage } = body;
+        const { id, status, riderId, riderName, etaMinutes, riderMessage, basketImageUrl } = body;
 
         if (!id) {
             return NextResponse.json({ success: false, error: "Missing errand ID" }, { status: 400 });
@@ -95,6 +95,7 @@ export async function PATCH(request: Request) {
         if (riderName !== undefined) updateData.riderName = riderName;
         if (etaMinutes !== undefined) updateData.estDeliveryTime = etaMinutes;
         if (riderMessage !== undefined) updateData.riderMessage = riderMessage;
+        if (basketImageUrl !== undefined) updateData.basketImageUrl = basketImageUrl;
 
         // Convert string ID to MongoDB ObjectId safely
         let queryId;

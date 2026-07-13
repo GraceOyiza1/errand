@@ -269,7 +269,7 @@ export default function CustomerOrdersPage() {
                                 <div className="flex items-start justify-between gap-3 p-5 pb-3">
                                     <div>
                                         <p className="text-[10px] uppercase tracking-widest text-slate-400">
-                                            Order from {new Date(order.createdAt).toLocaleDateString('en-GH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                            Order from {new Date(order.createdAt).toLocaleDateString('en-GH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'GMT', timeZoneName: 'short' })}
                                         </p>
                                         <h2 className="mt-1 text-lg font-bold text-errand-obsidian">{order.marketName}</h2>
                                         <p className="text-sm text-slate-500 mt-0.5">
@@ -308,6 +308,12 @@ export default function CustomerOrdersPage() {
                                             <div className="mt-2 flex gap-4 text-xs text-slate-500">
                                                 {order.estShoppingTime && <span>🛒 Shopping: ~{order.estShoppingTime} min</span>}
                                                 {order.estDeliveryTime && <span>🏍️ Delivery: ~{order.estDeliveryTime} min</span>}
+                                            </div>
+                                        )}
+                                        {order.basketImageUrl && (
+                                            <div className="mt-3">
+                                                <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">📸 Basket Photo from Shopper:</p>
+                                                <img src={order.basketImageUrl} alt="Shopper Basket" className="w-full max-w-sm rounded-lg object-cover border border-slate-200" />
                                             </div>
                                         )}
                                     </div>
