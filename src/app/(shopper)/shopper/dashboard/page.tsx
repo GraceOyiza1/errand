@@ -591,21 +591,21 @@ export default function ShopperDashboardPage() {
 
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     <div>
-                                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Market Shopping (Mins)</label>
+                                                        <label className="text-[10px] font-bold text-white uppercase tracking-wider block mb-1">Market Shopping (Mins)</label>
                                                         <input
                                                             type="number"
                                                             value={shoppingTime}
                                                             onChange={(e) => setShoppingTime(e.target.value)}
-                                                            className="w-full bg-errand-alabaster text-xs p-2.5 rounded-lg border border-slate-200 font-bold focus:outline-none"
+                                                            className="w-full bg-white text-purple-900 text-xs p-2.5 rounded-lg border border-purple-300 font-bold focus:outline-none"
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Bike Delivery Transit (Mins)</label>
+                                                        <label className="text-[10px] font-bold text-white uppercase tracking-wider block mb-1">Bike Delivery Transit (Mins)</label>
                                                         <input
                                                             type="number"
                                                             value={deliveryTime}
                                                             onChange={(e) => setDeliveryTime(e.target.value)}
-                                                            className="w-full bg-errand-alabaster text-xs p-2.5 rounded-lg border border-slate-200 font-bold focus:outline-none"
+                                                            className="w-full bg-white text-purple-900 text-xs p-2.5 rounded-lg border border-purple-300 font-bold focus:outline-none"
                                                         />
                                                     </div>
                                                 </div>

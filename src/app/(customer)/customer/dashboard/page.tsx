@@ -1058,38 +1058,38 @@ export default function CustomerDashboard() {
 
       {step === 3 && (
         <div className="space-y-6">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col mb-4">
             <button
               onClick={() => setStep(1)}
-              className="text-xs font-medium text-errand-leaf hover:underline cursor-pointer"
+              className="text-xs font-medium text-slate-400 hover:text-slate-600 cursor-pointer self-start mb-4"
             >
               ← Back to Markets
             </button>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-errand-obsidian">
-              Shop Errand
+            <h1 className="text-3xl font-normal tracking-tight text-slate-800">
+              Fruits & Vegetables
             </h1>
           </div>
-          <p className="text-slate-500 text-sm sm:text-base -mt-4">
-            Quickly add fresh produce directly to your cart for express delivery.
-          </p>
 
-          <div className="w-full sm:max-w-md">
-            <input
-              type="text"
-              placeholder="Search items..."
-              value={directSearchQuery}
-              onChange={(e) => setDirectSearchQuery(e.target.value)}
-              className="w-full text-sm border border-slate-200 p-3 rounded-xl bg-white focus:outline-emerald-600 placeholder:text-slate-400 shadow-sm"
-            />
+          <div className="flex justify-between items-center text-sm text-slate-500 mb-6">
+            <div className="w-1/2 sm:max-w-xs">
+              <input
+                type="text"
+                placeholder="Filter and search..."
+                value={directSearchQuery}
+                onChange={(e) => setDirectSearchQuery(e.target.value)}
+                className="w-full text-sm border-b border-slate-200 py-2 bg-transparent focus:outline-none focus:border-slate-800 placeholder:text-slate-400"
+              />
+            </div>
+            <span>{DIRECT_PRODUCTS.length} products</span>
           </div>
 
-          <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 overflow-x-auto sm:overflow-visible pb-6 gap-4 snap-x sm:snap-none hide-scrollbar">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pb-6 gap-3 sm:gap-4">
             {(() => {
               const filteredProducts = DIRECT_PRODUCTS.filter(p => p.name.toLowerCase().includes(directSearchQuery.toLowerCase()));
               
               if (filteredProducts.length === 0) {
                 return (
-                  <div className="w-full sm:col-span-2 md:col-span-3 lg:col-span-4 text-center py-10 bg-errand-alabaster border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center">
+                  <div className="w-full col-span-2 md:col-span-3 lg:col-span-4 text-center py-10 bg-errand-alabaster border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center">
                     <span className="text-4xl block mb-3">🔍</span>
                     <h3 className="font-bold text-slate-800 text-lg">We couldn't find "{directSearchQuery}"</h3>
                     <p className="text-slate-500 text-sm mt-1 mb-5 max-w-sm">
@@ -1111,32 +1111,37 @@ export default function CustomerDashboard() {
               return filteredProducts.map((product) => {
                 const qty = getDirectProductQty(product.name);
                 return (
-                  <div key={product.id} className="min-w-[240px] sm:min-w-0 max-w-[240px] sm:max-w-none w-full shrink-0 snap-start bg-errand-alabaster border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-                    <img src={product.imageUrl} alt={product.name} className="w-full h-40 sm:h-48 object-cover" />
-                    <div className="p-4 flex-1 flex flex-col">
-                      <h3 className="font-bold text-slate-800 text-lg leading-tight mb-1">{product.name}</h3>
-                      <p className="text-errand-leaf font-semibold text-sm mb-4">~₵{product.estimatedPrice} / {product.unit}</p>
+                  <div key={product.id} className="w-full bg-white border border-slate-100 rounded-lg overflow-hidden flex flex-col hover:border-slate-200 transition">
+                    <div className="p-3 sm:p-4 bg-white flex justify-center items-center h-28 sm:h-48">
+                      <img src={product.imageUrl} alt={product.name} className="max-h-full object-contain" />
+                    </div>
+                    <div className="p-3 flex-1 flex flex-col bg-white">
+                      <h3 className="font-medium text-slate-800 text-sm leading-tight mb-1">{product.name}</h3>
+                      <div className="flex items-center gap-2 mb-3">
+                        <p className="text-slate-400 line-through text-xs">GH₵{(product.estimatedPrice * 1.2).toFixed(2)}</p>
+                        <p className="text-slate-800 font-medium text-sm">GH₵{product.estimatedPrice.toFixed(2)}</p>
+                      </div>
                       
                       <div className="mt-auto">
                         {qty === 0 ? (
                           <button 
                             onClick={() => updateDirectProduct(product, 1)}
-                            className="w-full bg-slate-900 text-white font-bold py-2 rounded-xl text-sm hover:bg-slate-800 transition cursor-pointer"
+                            className="w-full border border-slate-200 text-slate-800 text-xs py-1.5 rounded-md hover:bg-slate-50 transition cursor-pointer"
                           >
                             Add to Cart
                           </button>
                         ) : (
-                          <div className="flex items-center justify-between bg-slate-100 rounded-xl p-1">
+                          <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-md p-1">
                             <button 
                               onClick={() => updateDirectProduct(product, -1)}
-                              className="bg-white text-slate-700 w-8 h-8 rounded-lg shadow-sm font-bold flex items-center justify-center hover:bg-slate-50 cursor-pointer"
+                              className="text-slate-500 w-6 h-6 rounded bg-white shadow-xs font-bold flex items-center justify-center hover:bg-slate-100 cursor-pointer"
                             >
                               -
                             </button>
-                            <span className="font-bold text-slate-800">{qty}</span>
+                            <span className="font-medium text-slate-800 text-xs">{qty}</span>
                             <button 
                               onClick={() => updateDirectProduct(product, 1)}
-                              className="bg-errand-leaf text-white w-8 h-8 rounded-lg shadow-sm font-bold flex items-center justify-center hover:bg-emerald-600 cursor-pointer"
+                              className="text-slate-700 w-6 h-6 rounded bg-white shadow-xs font-bold flex items-center justify-center hover:bg-slate-100 cursor-pointer"
                             >
                               +
                             </button>
