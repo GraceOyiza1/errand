@@ -85,6 +85,16 @@ const DIRECT_PRODUCTS = [
   { id: "dp2", name: "Red Onions", estimatedPrice: 25, unit: "basket", imageUrl: "/images/onionsx.webp" },
   { id: "dp3", name: "Fresh Cabbage", estimatedPrice: 20, unit: "head", imageUrl: "/images/cabbage_360x.webp" },
   { id: "dp4", name: "Green Bell Pepper", estimatedPrice: 45, unit: "basket", imageUrl: "/images/greenbellpepper_360x.webp" },
+  { id: "dp5", name: "Eggs", estimatedPrice: 40, unit: "crate", imageUrl: "/images/Egg.jpg" },
+  { id: "dp6", name: "Carrots", estimatedPrice: 30, unit: "bunch", imageUrl: "/images/carrot.jpg" },
+  { id: "dp7", name: "Fresh Cucumber", estimatedPrice: 15, unit: "bunch", imageUrl: "/images/fresh cucumber.jpg" },
+  { id: "dp8", name: "Ginger", estimatedPrice: 25, unit: "basket", imageUrl: "/images/ginger.jpg" },
+  { id: "dp9", name: "Kale", estimatedPrice: 20, unit: "bunch", imageUrl: "/images/kale.jpg" },
+  { id: "dp10", name: "Pears", estimatedPrice: 35, unit: "basket", imageUrl: "/images/pear.jpg" },
+  { id: "dp11", name: "Pineapple", estimatedPrice: 15, unit: "each", imageUrl: "/images/pineapple.jpg" },
+  { id: "dp12", name: "Potatoes", estimatedPrice: 50, unit: "bucket", imageUrl: "/images/potato.jpg" },
+  { id: "dp13", name: "Red Pepper", estimatedPrice: 45, unit: "basket", imageUrl: "/images/red pepper.jpg" },
+  { id: "dp14", name: "Sweet Strawberry", estimatedPrice: 60, unit: "punnet", imageUrl: "/images/sweet strawberry.jpg" },
 ];
 
 const MARKET_CATALOG: CatalogItem[] = [
@@ -108,6 +118,7 @@ export default function CustomerDashboard() {
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
   const [items, setItems] = useState<ShoppingItem[]>([]);
+  const [directSearchQuery, setDirectSearchQuery] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     "mobile-money" | "cash"
   >("mobile-money");
@@ -1062,46 +1073,81 @@ export default function CustomerDashboard() {
             Quickly add fresh produce directly to your cart for express delivery.
           </p>
 
-          <div className="flex overflow-x-auto pb-6 gap-4 snap-x hide-scrollbar">
-            {DIRECT_PRODUCTS.map((product) => {
-              const qty = getDirectProductQty(product.name);
-              return (
-                <div key={product.id} className="min-w-[240px] max-w-[240px] snap-start bg-errand-alabaster border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-                  <img src={product.imageUrl} alt={product.name} className="w-full h-40 object-cover" />
-                  <div className="p-4 flex-1 flex flex-col">
-                    <h3 className="font-bold text-slate-800 text-lg leading-tight mb-1">{product.name}</h3>
-                    <p className="text-errand-leaf font-semibold text-sm mb-4">~₵{product.estimatedPrice} / {product.unit}</p>
-                    
-                    <div className="mt-auto">
-                      {qty === 0 ? (
-                        <button 
-                          onClick={() => updateDirectProduct(product, 1)}
-                          className="w-full bg-slate-900 text-white font-bold py-2 rounded-xl text-sm hover:bg-slate-800 transition"
-                        >
-                          Add to Cart
-                        </button>
-                      ) : (
-                        <div className="flex items-center justify-between bg-slate-100 rounded-xl p-1">
-                          <button 
-                            onClick={() => updateDirectProduct(product, -1)}
-                            className="bg-white text-slate-700 w-8 h-8 rounded-lg shadow-sm font-bold flex items-center justify-center hover:bg-slate-50"
-                          >
-                            -
-                          </button>
-                          <span className="font-bold text-slate-800">{qty}</span>
+          <div className="w-full sm:max-w-md">
+            <input
+              type="text"
+              placeholder="Search items..."
+              value={directSearchQuery}
+              onChange={(e) => setDirectSearchQuery(e.target.value)}
+              className="w-full text-sm border border-slate-200 p-3 rounded-xl bg-white focus:outline-emerald-600 placeholder:text-slate-400 shadow-sm"
+            />
+          </div>
+
+          <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 overflow-x-auto sm:overflow-visible pb-6 gap-4 snap-x sm:snap-none hide-scrollbar">
+            {(() => {
+              const filteredProducts = DIRECT_PRODUCTS.filter(p => p.name.toLowerCase().includes(directSearchQuery.toLowerCase()));
+              
+              if (filteredProducts.length === 0) {
+                return (
+                  <div className="w-full sm:col-span-2 md:col-span-3 lg:col-span-4 text-center py-10 bg-errand-alabaster border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center">
+                    <span className="text-4xl block mb-3">🔍</span>
+                    <h3 className="font-bold text-slate-800 text-lg">We couldn't find "{directSearchQuery}"</h3>
+                    <p className="text-slate-500 text-sm mt-1 mb-5 max-w-sm">
+                      No worries! You can still add it directly to your cart as a custom request. Our shopper will find it for you.
+                    </p>
+                    <button
+                      onClick={() => {
+                        updateDirectProduct({ id: crypto.randomUUID(), name: directSearchQuery, estimatedPrice: 20, unit: "custom item", imageUrl: "/images/food0.webp" }, 1);
+                        setDirectSearchQuery("");
+                      }}
+                      className="bg-slate-900 text-white font-bold py-3 px-6 rounded-xl text-sm hover:bg-slate-800 transition shadow-sm cursor-pointer"
+                    >
+                      + Add "{directSearchQuery}" to Cart
+                    </button>
+                  </div>
+                );
+              }
+
+              return filteredProducts.map((product) => {
+                const qty = getDirectProductQty(product.name);
+                return (
+                  <div key={product.id} className="min-w-[240px] sm:min-w-0 max-w-[240px] sm:max-w-none w-full shrink-0 snap-start bg-errand-alabaster border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                    <img src={product.imageUrl} alt={product.name} className="w-full h-40 sm:h-48 object-cover" />
+                    <div className="p-4 flex-1 flex flex-col">
+                      <h3 className="font-bold text-slate-800 text-lg leading-tight mb-1">{product.name}</h3>
+                      <p className="text-errand-leaf font-semibold text-sm mb-4">~₵{product.estimatedPrice} / {product.unit}</p>
+                      
+                      <div className="mt-auto">
+                        {qty === 0 ? (
                           <button 
                             onClick={() => updateDirectProduct(product, 1)}
-                            className="bg-errand-leaf text-white w-8 h-8 rounded-lg shadow-sm font-bold flex items-center justify-center hover:bg-emerald-600"
+                            className="w-full bg-slate-900 text-white font-bold py-2 rounded-xl text-sm hover:bg-slate-800 transition cursor-pointer"
                           >
-                            +
+                            Add to Cart
                           </button>
-                        </div>
-                      )}
+                        ) : (
+                          <div className="flex items-center justify-between bg-slate-100 rounded-xl p-1">
+                            <button 
+                              onClick={() => updateDirectProduct(product, -1)}
+                              className="bg-white text-slate-700 w-8 h-8 rounded-lg shadow-sm font-bold flex items-center justify-center hover:bg-slate-50 cursor-pointer"
+                            >
+                              -
+                            </button>
+                            <span className="font-bold text-slate-800">{qty}</span>
+                            <button 
+                              onClick={() => updateDirectProduct(product, 1)}
+                              className="bg-errand-leaf text-white w-8 h-8 rounded-lg shadow-sm font-bold flex items-center justify-center hover:bg-emerald-600 cursor-pointer"
+                            >
+                              +
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              });
+            })()}
           </div>
 
           {items.length > 0 && (
