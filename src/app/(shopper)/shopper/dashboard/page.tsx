@@ -514,7 +514,7 @@ export default function ShopperDashboardPage() {
                                                     <MapPin className="w-3.5 h-3.5 text-errand-leaf" />
                                                     <span>{errand.marketName} • {errand.location || 'Local Market'}</span>
                                                 </div>
-                                                <h3 className="text-base font-extrabold text-errand-obsidian mt-1">Bulk Household Restock Run</h3>
+                                                <h3 className="text-base font-extrabold text-errand-obsidian mt-1">Errand Household Restock Run</h3>
                                             </div>
                                             <div className="text-right">
                                                 <span className="text-[10px] text-slate-400 uppercase font-bold block">Guaranteed Payout</span>
@@ -618,7 +618,7 @@ export default function ShopperDashboardPage() {
                                                 <div className="p-4 bg-purple-400 rounded-xl border border-purple-400">
                                                     <h4 className="font-extrabold text-xs text-white uppercase tracking-wider flex items-center space-x-1">
                                                         <ShoppingBag className="w-4 h-4 text-white" />
-                                                        <span>Sourcing Quality Inspection Ledger</span>
+                                                        <span>Sourcing Quality Inspection</span>
                                                     </h4>
                                                     <p className="text-[11px] text-white mt-0.5">Cross-check conditions with seller to protect order value.</p>
 
@@ -688,7 +688,7 @@ export default function ShopperDashboardPage() {
                                                     onClick={handleClearErrandRun}
                                                     className="text-xs font-bold text-slate-600 bg-errand-alabaster border border-slate-200 rounded-lg px-3 py-1.5 mt-2 hover:bg-errand-alabaster"
                                                 >
-                                                    Clear Route Pipeline
+                                                    Validation
                                                 </button>
                                             </div>
                                         )}
@@ -697,7 +697,7 @@ export default function ShopperDashboardPage() {
                                         {errandState !== "completed" && (
                                             <div className="pt-4 border-t border-slate-200 space-y-4">
                                                 <div className="bg-white p-4 rounded-xl border border-slate-200">
-                                                    <label className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-2">Send Custom Update to Customer</label>
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-2">Send Update to Customer</label>
                                                     <div className="flex gap-2">
                                                         <input
                                                             type="text"
@@ -731,7 +731,7 @@ export default function ShopperDashboardPage() {
 
                                 {errandState === "pool" && poolErrands.length === 0 && (
                                     <div className="bg-errand-alabaster rounded-2xl border border-slate-200 p-8 text-center text-slate-400 text-xs font-medium">
-                                        No active local market requests currently listed in your station.
+                                        No active local market requests currently listed in your location.
                                     </div>
                                 )}
 
@@ -771,7 +771,7 @@ export default function ShopperDashboardPage() {
 
                                 {/* Rides History */}
                                 <div className="bg-errand-alabaster rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
-                                    <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider block">Your Past Runs Ledger</span>
+                                    <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider block">Your Past Runs</span>
                                     <div className="space-y-2">
                                         {historyErrands.length > 0 ? historyErrands.map((history: any) => (
                                             <div key={history._id || history.id} className="p-3 bg-errand-alabaster border border-slate-100 rounded-xl text-xs flex justify-between items-start">
