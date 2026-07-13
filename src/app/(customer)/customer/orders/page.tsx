@@ -29,6 +29,7 @@ interface Errand {
     createdAt: string;
     lockTimeDeadline?: string;
     items: ErrandItem[];
+    basketImageUrl?: string;
 }
 
 const STATUS_STEPS = [

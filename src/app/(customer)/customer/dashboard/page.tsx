@@ -72,6 +72,21 @@ const ACCRA_MARKETS: Market[] = [
   },
 ];
 
+const DIRECT_SHOP_MARKET: Market = {
+  id: "direct_shop",
+  name: "Direct Shop - Express Delivery",
+  description: "Quick checkout for common fresh items without choosing a specific market.",
+  tag: "Express",
+  baseDeliveryFee: 20
+};
+
+const DIRECT_PRODUCTS = [
+  { id: "dp1", name: "Fresh Tomatoes", estimatedPrice: 30, unit: "bucket", imageUrl: "/images/tomatoes_493x.webp" },
+  { id: "dp2", name: "Red Onions", estimatedPrice: 25, unit: "basket", imageUrl: "/images/onionsx.webp" },
+  { id: "dp3", name: "Fresh Cabbage", estimatedPrice: 20, unit: "head", imageUrl: "/images/cabbage_360x.webp" },
+  { id: "dp4", name: "Green Bell Pepper", estimatedPrice: 45, unit: "basket", imageUrl: "/images/greenbellpepper_360x.webp" },
+];
+
 const MARKET_CATALOG: CatalogItem[] = [
   {
     id: "p1",
@@ -91,7 +106,7 @@ const MARKET_CATALOG: CatalogItem[] = [
 
 export default function CustomerDashboard() {
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
-  const [step, setStep] = useState<0 | 1 | 2>(0);
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
   const [items, setItems] = useState<ShoppingItem[]>([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     "mobile-money" | "cash"
@@ -218,6 +233,34 @@ export default function CustomerDashboard() {
     setCheckoutMessage(
       "Order reopened for editing. Make your changes and check out again.",
     );
+  };
+
+  const updateDirectProduct = (product: any, increment: number) => {
+    setItems((prevItems) => {
+      const existing = prevItems.find((i) => i.name === product.name);
+      if (existing) {
+        const newQty = existing.quantity + increment;
+        if (newQty <= 0) return prevItems.filter((i) => i.name !== product.name);
+        return prevItems.map((i) => i.name === product.name ? { ...i, quantity: newQty } : i);
+      } else if (increment > 0) {
+        return [...prevItems, {
+          id: crypto.randomUUID(),
+          name: product.name,
+          targetPrice: product.estimatedPrice,
+          quantity: 1,
+          unit: product.unit,
+          notes: "",
+          imageUrls: [product.imageUrl],
+          isCustom: false,
+        }];
+      }
+      return prevItems;
+    });
+  };
+
+  const getDirectProductQty = (productName: string) => {
+    const item = items.find((i) => i.name === productName);
+    return item ? item.quantity : 0;
   };
 
   const handleAddItem = (e: React.FormEvent) => {
@@ -502,12 +545,24 @@ export default function CustomerDashboard() {
                 Select the market where our shopper should buy your Groceries.
               </p>
             </div>
-            <button
-              onClick={() => setStep(0)}
-              className="text-xs sm:text-sm font-medium text-slate-500 hover:text-errand-leaf cursor-pointer whitespace-nowrap"
-            >
-              Edit Profile
-            </button>
+            <div className="flex flex-col items-end gap-2">
+              <button
+                onClick={() => {
+                  setSelectedMarket(DIRECT_SHOP_MARKET);
+                  setItems([]);
+                  setStep(3);
+                }}
+                className="bg-white border border-slate-200 shadow-sm text-errand-obsidian font-extrabold px-6 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer uppercase tracking-wider"
+              >
+                SHOP ERRAND
+              </button>
+              <button
+                onClick={() => setStep(0)}
+                className="text-xs sm:text-sm font-medium text-slate-500 hover:text-errand-leaf cursor-pointer whitespace-nowrap"
+              >
+                Edit Profile
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-6">
@@ -987,6 +1042,136 @@ export default function CustomerDashboard() {
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {step === 3 && (
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setStep(1)}
+              className="text-xs font-medium text-errand-leaf hover:underline cursor-pointer"
+            >
+              ← Back to Markets
+            </button>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-errand-obsidian">
+              Shop Errand
+            </h1>
+          </div>
+          <p className="text-slate-500 text-sm sm:text-base -mt-4">
+            Quickly add fresh produce directly to your cart for express delivery.
+          </p>
+
+          <div className="flex overflow-x-auto pb-6 gap-4 snap-x hide-scrollbar">
+            {DIRECT_PRODUCTS.map((product) => {
+              const qty = getDirectProductQty(product.name);
+              return (
+                <div key={product.id} className="min-w-[240px] max-w-[240px] snap-start bg-errand-alabaster border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                  <img src={product.imageUrl} alt={product.name} className="w-full h-40 object-cover" />
+                  <div className="p-4 flex-1 flex flex-col">
+                    <h3 className="font-bold text-slate-800 text-lg leading-tight mb-1">{product.name}</h3>
+                    <p className="text-errand-leaf font-semibold text-sm mb-4">~₵{product.estimatedPrice} / {product.unit}</p>
+                    
+                    <div className="mt-auto">
+                      {qty === 0 ? (
+                        <button 
+                          onClick={() => updateDirectProduct(product, 1)}
+                          className="w-full bg-slate-900 text-white font-bold py-2 rounded-xl text-sm hover:bg-slate-800 transition"
+                        >
+                          Add to Cart
+                        </button>
+                      ) : (
+                        <div className="flex items-center justify-between bg-slate-100 rounded-xl p-1">
+                          <button 
+                            onClick={() => updateDirectProduct(product, -1)}
+                            className="bg-white text-slate-700 w-8 h-8 rounded-lg shadow-sm font-bold flex items-center justify-center hover:bg-slate-50"
+                          >
+                            -
+                          </button>
+                          <span className="font-bold text-slate-800">{qty}</span>
+                          <button 
+                            onClick={() => updateDirectProduct(product, 1)}
+                            className="bg-errand-leaf text-white w-8 h-8 rounded-lg shadow-sm font-bold flex items-center justify-center hover:bg-emerald-600"
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {items.length > 0 && (
+            <div className="bg-errand-alabaster border border-slate-200 p-4 sm:p-6 rounded-2xl shadow-sm space-y-4 max-w-2xl">
+              <h2 className="font-bold text-xl text-errand-obsidian border-b border-slate-200 pb-3">Your Cart</h2>
+              
+              <ul className="space-y-3">
+                {items.map((item, idx) => (
+                  <li key={idx} className="flex justify-between items-center text-sm">
+                    <span className="text-slate-700 font-medium">{item.quantity} × {item.name}</span>
+                    <span className="font-bold text-slate-800">~₵{item.targetPrice * item.quantity}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="border-t border-slate-200 pt-3 space-y-2">
+                <div className="flex justify-between text-sm text-slate-500">
+                  <span>Subtotal Estimate</span>
+                  <span>₵{itemsSubtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-slate-500">
+                  <span>Delivery Fee</span>
+                  <span>₵{DIRECT_SHOP_MARKET.baseDeliveryFee.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold text-errand-obsidian pt-2">
+                  <span>Total Est. Checkout</span>
+                  <span>₵{grandTotal.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className="pt-4 grid gap-3 sm:grid-cols-2">
+                <button
+                  onClick={() => { setSelectedPaymentMethod("mobile-money"); setCheckoutMessage(""); }}
+                  className={`rounded-xl px-4 py-3 text-sm font-bold transition ${selectedPaymentMethod === "mobile-money" ? "bg-errand-leaf text-errand-obsidian" : "bg-slate-900 text-white hover:bg-slate-800"}`}
+                >
+                  Pay with MoMo / Card
+                </button>
+                <button
+                  onClick={() => { setSelectedPaymentMethod("cash"); setCheckoutMessage(""); }}
+                  className={`rounded-xl px-4 py-3 text-sm font-bold transition ${selectedPaymentMethod === "cash" ? "bg-errand-ochre text-errand-obsidian" : "bg-slate-900 text-white hover:bg-slate-800"}`}
+                >
+                  Cash on Delivery
+                </button>
+              </div>
+
+              {checkoutMessage && (
+                <div className={`rounded-xl px-4 py-3 text-xs font-medium ${selectedPaymentMethod === "cash" ? "bg-errand-ochre/10 text-errand-ochre" : "bg-errand-leaf/10 text-errand-leaf"}`}>
+                  {checkoutMessage}
+                </div>
+              )}
+
+              {confirmedOrder ? (
+                <div className="mt-4 p-5 rounded-2xl bg-errand-leaf/10 border border-errand-leaf">
+                  <p className="text-errand-leaf font-bold text-lg mb-2">Order Confirmed! 🎉</p>
+                  <p className="text-sm text-slate-700 mb-4">Your express Direct Shop errand has been submitted successfully.</p>
+                  <a href="/customer/orders" className="inline-block bg-errand-leaf text-white font-bold py-2 px-5 rounded-xl text-sm shadow-sm hover:bg-emerald-600 transition">
+                    View My Orders & Track Status
+                  </a>
+                </div>
+              ) : (
+                <button
+                  onClick={handleCheckout}
+                  disabled={isCheckingOut}
+                  className="w-full bg-errand-leaf hover:bg-errand-leaf text-errand-obsidian font-extrabold text-lg px-6 py-4 rounded-xl shadow-md transition disabled:opacity-50 cursor-pointer mt-4"
+                >
+                  {isCheckingOut ? "Processing..." : "Confirm & Checkout"}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
