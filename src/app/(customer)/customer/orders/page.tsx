@@ -189,9 +189,9 @@ export default function CustomerOrdersPage() {
 
     const statusBadge: Record<string, string> = {
         paid_editable: 'bg-blue-100 text-errand-clay',
-        locked: 'bg-errand-ochre text-white',
+        locked: 'bg-purple-400 text-white',
         accepted: 'bg-purple-100 text-purple-700',
-        shopping: 'bg-errand-ochre text-white',
+        shopping: 'bg-purple-400 text-white',
         delivering: 'bg-indigo-100 text-errand-clay',
         completed: 'bg-errand-leaf text-white',
         cancelled: 'bg-rose-100 text-rose-600',
@@ -369,20 +369,20 @@ export default function CustomerOrdersPage() {
                                 {/* Edit window banner */}
                                 {order.status === 'paid_editable' && (
                                     <div className={`mx-5 mb-5 rounded-xl px-4 py-3 flex items-center justify-between ${secs > 0
-                                        ? 'bg-errand-ochre border border-errand-ochre'
+                                        ? 'bg-purple-400 border border-purple-400'
                                         : 'bg-slate-100 border border-slate-200'
                                         }`}>
                                         {secs > 0 ? (
                                             <>
                                                 <div>
-                                                    <p className="text-xs font-bold text-errand-ochre">
+                                                    <p className="text-xs font-bold text-white">
                                                         ✏️ Edit window closes in {timeStr}
                                                     </p>
-                                                    <p className="text-[10px] text-errand-ochre mt-0.5">
+                                                    <p className="text-[10px] text-white mt-0.5">
                                                         You can still add or remove items
                                                     </p>
                                                 </div>
-                                                <div className="text-2xl font-black text-errand-ochre tabular-nums">{timeStr}</div>
+                                                <div className="text-2xl font-black text-white tabular-nums">{timeStr}</div>
                                             </>
                                         ) : (
                                             <p className="text-xs font-bold text-slate-500">

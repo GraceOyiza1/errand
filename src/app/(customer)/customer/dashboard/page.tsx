@@ -718,7 +718,7 @@ export default function CustomerDashboard() {
                               {item.name}
                             </h4>
                             {item.isCustom && (
-                              <span className="text-[9px] sm:text-[10px] bg-errand-ochre text-errand-ochre px-1.5 py-0.5 rounded-sm font-bold">
+                              <span className="text-[9px] sm:text-[10px] bg-purple-400 text-white px-1.5 py-0.5 rounded-sm font-bold">
                                 Unlisted Request
                               </span>
                             )}
@@ -925,19 +925,19 @@ export default function CustomerDashboard() {
                       </div>
 
                       {timeLeft !== null && timeLeft > 0 ? (
-                        <div className="mt-5 p-4 bg-errand-ochre border border-errand-ochre rounded-xl flex items-center justify-between">
+                        <div className="mt-5 p-4 bg-purple-400 border border-purple-400 rounded-xl flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-bold text-errand-ochre">
+                            <p className="text-xs font-bold text-white">
                               Order locks in {Math.floor(timeLeft / 60)}:
                               {(timeLeft % 60).toString().padStart(5, "0")}
                             </p>
-                            <p className="text-[10px] text-errand-ochre mt-0.5">
+                            <p className="text-[10px] text-white mt-0.5">
                               You have 5 minutes to change items
                             </p>
                           </div>
                           <button
                             onClick={handleEditOrder}
-                            className="text-xs font-bold bg-errand-ochre text-errand-ochre px-4 py-2 rounded-lg hover:bg-errand-ochre transition shadow-xs cursor-pointer"
+                            className="text-xs font-bold bg-white text-purple-600 px-4 py-2 rounded-lg hover:bg-slate-50 transition shadow-xs cursor-pointer"
                           >
                             Edit Order
                           </button>

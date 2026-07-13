@@ -268,7 +268,7 @@ export default function ShopperDashboardPage() {
                             <span className="text-xs font-black bg-blue-100 text-errand-clay px-3 py-1 rounded-full border border-blue-200"> Login Required</span>
                         )}
                         {shopperStatus === "under_review" && (
-                            <span className="text-xs font-black bg-errand-ochre text-errand-ochre px-3 py-1 rounded-full border border-errand-ochre animate-pulse">⏳ Under Review</span>
+                            <span className="text-xs font-black bg-purple-400 text-white px-3 py-1 rounded-full border border-purple-400 animate-pulse">⏳ Under Review</span>
                         )}
                         {shopperStatus === "verified" && (
                             <span className="text-xs font-black bg-errand-leaf text-white px-3 py-1 rounded-full border border-errand-leaf">✅ Authorized Sourcing Agent</span>
@@ -454,7 +454,7 @@ export default function ShopperDashboardPage() {
            ========================================================= */}
                 {shopperStatus === "under_review" && (
                     <div className="bg-errand-alabaster rounded-2xl border border-slate-200 p-8 text-center shadow-lg space-y-4">
-                        <div className="w-16 h-16 bg-errand-ochre text-errand-ochre rounded-full flex items-center justify-center mx-auto border border-errand-ochre">
+                        <div className="w-16 h-16 bg-purple-400 text-white rounded-full flex items-center justify-center mx-auto border border-purple-400">
                             <Clock className="w-8 h-8 animate-spin" />
                         </div>
                         <div>
@@ -571,13 +571,13 @@ export default function ShopperDashboardPage() {
 
                                         {/* STEP A: MANUAL TIME ADJUSTMENTS */}
                                         {errandState === "accepted" && (
-                                            <div className="bg-errand-ochre border border-errand-ochre rounded-xl p-4 space-y-4">
+                                            <div className="bg-purple-400 border border-purple-400 rounded-xl p-4 space-y-4">
                                                 <div>
-                                                    <h4 className="font-extrabold text-xs text-errand-ochre uppercase tracking-wider flex items-center space-x-1">
-                                                        <Clock className="w-4 h-4 text-errand-ochre" />
+                                                    <h4 className="font-extrabold text-xs text-white uppercase tracking-wider flex items-center space-x-1">
+                                                        <Clock className="w-4 h-4 text-white" />
                                                         <span>Set Manual Errand Countdown Estimates</span>
                                                     </h4>
-                                                    <p className="text-[11px] text-errand-ochre mt-1">
+                                                    <p className="text-[11px] text-white mt-1">
                                                         Estimate your timeline accurately for the customer before entering the market grounds.
                                                     </p>
                                                 </div>
@@ -605,7 +605,7 @@ export default function ShopperDashboardPage() {
 
                                                 <button
                                                     onClick={handleStartShopping}
-                                                    className="w-full bg-errand-ochre hover:bg-errand-ochre text-white font-extrabold py-3 rounded-lg text-xs transition"
+                                                    className="w-full bg-purple-400 hover:bg-purple-500 text-white font-extrabold py-3 rounded-lg text-xs transition"
                                                 >
                                                     Start Sourcing
                                                 </button>
@@ -615,12 +615,12 @@ export default function ShopperDashboardPage() {
                                         {/* STEP B: MARKET WORKPLACE VETTING CHECKS */}
                                         {errandState === "shopping" && (
                                             <div className="space-y-4">
-                                                <div className="p-4 bg-errand-ochre rounded-xl border border-errand-ochre">
-                                                    <h4 className="font-extrabold text-xs text-errand-ochre uppercase tracking-wider flex items-center space-x-1">
-                                                        <ShoppingBag className="w-4 h-4 text-errand-ochre" />
+                                                <div className="p-4 bg-purple-400 rounded-xl border border-purple-400">
+                                                    <h4 className="font-extrabold text-xs text-white uppercase tracking-wider flex items-center space-x-1">
+                                                        <ShoppingBag className="w-4 h-4 text-white" />
                                                         <span>Sourcing Quality Inspection Ledger</span>
                                                     </h4>
-                                                    <p className="text-[11px] text-errand-ochre mt-0.5">Cross-check conditions with seller to protect order value.</p>
+                                                    <p className="text-[11px] text-white mt-0.5">Cross-check conditions with seller to protect order value.</p>
 
                                                     <div className="space-y-2 mt-3">
                                                         {activeErrand.items.map((item: any, idx: number) => (
