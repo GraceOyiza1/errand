@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Clock } from 'lucide-react';
+import Footer from '@/components/Footer';
 
 export default function CustomerLayout({
     children,
@@ -28,9 +29,11 @@ export default function CustomerLayout({
                 </div>
             </header>
 
-            <main className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto">
+            <main className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto pb-24">
                 {children}
             </main>
+            
+            <Footer />
         </div>
     );
 }

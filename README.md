@@ -5,10 +5,12 @@ Errand is a full-stack Next.js application that bridges the gap between everyday
 ## Core Features
 
 ### 🛒 Customer Experience
+* **Express "Shop Errand" Mode:** A fully responsive, image-rich product grid allowing customers to bypass the standard market flow and instantly add common fresh produce (e.g., tomatoes, cabbages, fruits) to their cart.
+* **Intelligent Search & Custom Fallback:** Fast client-side filtering for express items. If a searched item isn't in the catalog, it gracefully falls back, allowing the customer to add it as a custom request with a single click.
 * **Dynamic Market Selection:** Customers can choose specific local markets based on their needs (e.g., bulk items vs. fresh produce).
 * **Flexible Errand Buckets:** Users can add standardized catalog items with estimated prices, or create custom open-text requests (like "Dawadawa" or specific measurements).
 * **Smart Pricing Engine:** Automatically calculates base target prices, delivery fees, and dynamic variable-pricing buffers to protect against open-market price fluctuations.
-* **Live Order Tracking:** Real-time polling keeps the customer updated on the status of their order and ETA once a shopper is assigned.
+* **Live Order Tracking:** Real-time polling keeps the customer updated on the status of their order, displaying visual evidence (basket photos) and ETAs once a shopper is assigned.
 
 ### 🎒 Shopper (Rider) Gateway
 * **Tiered Access:** New shoppers must complete a KYC verification onboarding flow before accessing the live dispatch pool.

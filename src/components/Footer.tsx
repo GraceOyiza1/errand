@@ -1,0 +1,112 @@
+"use client";
+
+import React, { useState } from 'react';
+import { Globe, Camera, Mail, X, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+
+export default function Footer() {
+  const [activeModal, setActiveModal] = useState<'about' | 'policy' | null>(null);
+
+  return (
+    <>
+      <footer className="bg-purple-100/50 pt-16 pb-8 border-t border-purple-200 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+            {/* Column 1 */}
+            <div>
+              <h3 className="font-semibold text-purple-950 mb-6">About us</h3>
+              <ul className="space-y-4 text-sm text-purple-800">
+                <li><button onClick={() => setActiveModal('about')} className="hover:text-purple-600 transition text-left">Who are we?</button></li>
+                <li><button onClick={() => setActiveModal('policy')} className="hover:text-purple-600 transition text-left">Conditions</button></li>
+                <li><Link href="#" className="hover:text-purple-600 transition block">Privacy</Link></li>
+                <li><Link href="#" className="hover:text-purple-600 transition block">Refund</Link></li>
+              </ul>
+            </div>
+
+            {/* Column 2 */}
+            <div>
+              <h3 className="font-semibold text-purple-950 mb-6">Connect</h3>
+              <ul className="space-y-4 text-sm text-purple-800">
+                <li><Link href="#" className="hover:text-purple-600 transition block">Shopping Hacks</Link></li>
+                <li><Link href="#" className="hover:text-purple-600 transition block">Delivery areas</Link></li>
+                <li><Link href="#" className="hover:text-purple-600 transition block">FAQ</Link></li>
+                <li><Link href="#" className="hover:text-purple-600 transition block">Customer support</Link></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Section: Newsletter and Socials */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-12">
+            <div className="w-full max-w-sm">
+              <h3 className="text-sm font-medium text-purple-950 mb-4">Be the first to know about our latest promotions</h3>
+              <div className="relative">
+                <input 
+                  type="email" 
+                  placeholder="Email" 
+                  className="w-full bg-transparent border border-purple-300 text-purple-900 p-3 pr-12 focus:outline-none focus:border-purple-500 transition placeholder:text-purple-500/70"
+                />
+                <button className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-500 hover:text-purple-950 transition">
+                   <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-6 text-purple-950">
+              <Link href="#" className="hover:text-purple-600 transition" title="LinkedIn"><Globe className="w-5 h-5" /></Link>
+              <Link href="#" className="hover:text-purple-600 transition" title="Facebook"><Mail className="w-5 h-5" /></Link>
+              <Link href="#" className="hover:text-purple-600 transition" title="Instagram"><Camera className="w-5 h-5" /></Link>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="text-center border-t border-purple-200/50 pt-8">
+            <p className="text-xs text-purple-500 font-medium">© {new Date().getFullYear()}, Errand</p>
+          </div>
+
+        </div>
+      </footer>
+
+      {/* Modal Overlay */}
+      {activeModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
+              <h3 className="font-bold text-errand-obsidian text-lg">
+                {activeModal === 'about' ? 'About Errand' : 'How It Works & Policy'}
+              </h3>
+              <button 
+                onClick={() => setActiveModal(null)}
+                className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 text-slate-600 text-sm leading-relaxed">
+              {activeModal === 'about' && (
+                <p>
+                  Errand saves you time from going to the market. Let our trusted shoppers handle the heavy lifting, hand-picking the freshest produce and delivering it right to your doorstep with speed and reliability.
+                </p>
+              )}
+              {activeModal === 'policy' && (
+                <p>
+                  Our policy is simple: transparent pricing, guaranteed freshness, and seamless delivery. You select your market, confirm your list, and our shoppers use real-time negotiation and status updates to keep you informed every step of the way.
+                </p>
+              )}
+            </div>
+            
+            <div className="p-4 border-t border-slate-100 flex justify-end">
+              <button 
+                onClick={() => setActiveModal(null)}
+                className="px-4 py-2 bg-slate-900 text-white font-bold text-sm rounded-xl hover:bg-slate-800 transition"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

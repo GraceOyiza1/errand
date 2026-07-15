@@ -536,7 +536,7 @@ export default function ShopperDashboardPage() {
                                                     onClick={handleClearErrandRun}
                                                     className="text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-lg px-3 py-1.5 mt-2 hover:bg-slate-50"
                                                 >
-                                                    Validation
+                                                    Confirmed
                                                 </button>
                                             </div>
                                         )}
@@ -581,7 +581,7 @@ export default function ShopperDashboardPage() {
 
                                 {/* Rides History Records Ledger */}
                                 <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
-                                    <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider block">Your Past Runs Ledger</span>
+                                    <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider block">Your Past Runs</span>
 
                                     <div className="space-y-2">
                                         {historyErrands.length > 0 ? historyErrands.map((history: any) => (
