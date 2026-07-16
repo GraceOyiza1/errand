@@ -27,6 +27,9 @@ export async function GET(request: Request) {
                 // Show ONLY open marketplace errands available to be claimed
                 query.status = { $in: ['paid_editable', 'locked'] };
                 query.riderId = null;
+                // Clean off unaccepted orders after 24 hours
+                const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+                query.createdAt = { $gte: oneDayAgo };
             }
         }
 

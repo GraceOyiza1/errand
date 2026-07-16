@@ -563,7 +563,7 @@ export default function CustomerDashboard() {
                   setItems([]);
                   setStep(3);
                 }}
-                className="bg-white border border-slate-200 shadow-sm text-errand-obsidian font-extrabold px-6 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer uppercase tracking-wider"
+                className="bg-purple-100 border border-purple-200 shadow-sm text-purple-900 font-extrabold px-6 py-2 rounded-xl hover:bg-purple-200 transition cursor-pointer uppercase tracking-wider"
               >
                 SHOP ERRAND
               </button>

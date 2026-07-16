@@ -294,7 +294,17 @@ export default function CustomerOrdersPage() {
                                             ❌ This order was cancelled.
                                         </div>
                                     ) : (
-                                        <StatusTimeline status={order.status} />
+                                        <>
+                                            <StatusTimeline status={order.status} />
+                                            {order.status === 'locked' && (Date.now() - new Date(order.createdAt).getTime() > 60 * 60 * 1000) && (
+                                                <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 font-medium flex items-start gap-2">
+                                                    <span className="text-amber-500">⚠️</span>
+                                                    <span>
+                                                        We're sorry, but no shopper has accepted your order yet after an hour. This can happen during peak hours or if the payout is too low. You may want to cancel and try again with a higher payout.
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                 </div>
 

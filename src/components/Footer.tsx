@@ -9,29 +9,29 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="bg-purple-100/50 pt-16 pb-8 border-t border-purple-200 mt-auto">
+      <footer className="bg-purple-100/50 dark:bg-slate-950 pt-16 pb-8 border-t border-purple-200 dark:border-slate-800 mt-auto transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
             {/* Column 1 */}
             <div>
-              <h3 className="font-semibold text-purple-950 mb-6">About us</h3>
-              <ul className="space-y-4 text-sm text-purple-800">
-                <li><button onClick={() => setActiveModal('about')} className="hover:text-purple-600 transition text-left">Who are we?</button></li>
-                <li><button onClick={() => setActiveModal('policy')} className="hover:text-purple-600 transition text-left">Conditions</button></li>
-                <li><Link href="#" className="hover:text-purple-600 transition block">Privacy</Link></li>
-                <li><Link href="#" className="hover:text-purple-600 transition block">Refund</Link></li>
+              <h3 className="font-semibold text-purple-950 dark:text-purple-100 mb-6 transition-colors">About us</h3>
+              <ul className="space-y-4 text-sm text-purple-800 dark:text-purple-300 transition-colors">
+                <li><button onClick={() => setActiveModal('about')} className="hover:text-purple-600 dark:hover:text-purple-400 transition text-left">Who are we?</button></li>
+                <li><button onClick={() => setActiveModal('policy')} className="hover:text-purple-600 dark:hover:text-purple-400 transition text-left">Conditions</button></li>
+                <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">Privacy</Link></li>
+                <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">Refund</Link></li>
               </ul>
             </div>
 
             {/* Column 2 */}
             <div>
-              <h3 className="font-semibold text-purple-950 mb-6">Connect</h3>
-              <ul className="space-y-4 text-sm text-purple-800">
-                <li><Link href="#" className="hover:text-purple-600 transition block">Shopping Hacks</Link></li>
-                <li><Link href="#" className="hover:text-purple-600 transition block">Delivery areas</Link></li>
-                <li><Link href="#" className="hover:text-purple-600 transition block">FAQ</Link></li>
-                <li><Link href="#" className="hover:text-purple-600 transition block">Customer support</Link></li>
+              <h3 className="font-semibold text-purple-950 dark:text-purple-100 mb-6 transition-colors">Connect</h3>
+              <ul className="space-y-4 text-sm text-purple-800 dark:text-purple-300 transition-colors">
+                <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">Shopping Hacks</Link></li>
+                <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">Delivery areas</Link></li>
+                <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">FAQ</Link></li>
+                <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">Customer support</Link></li>
               </ul>
             </div>
           </div>
@@ -39,29 +39,29 @@ export default function Footer() {
           {/* Bottom Section: Newsletter and Socials */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-12">
             <div className="w-full max-w-sm">
-              <h3 className="text-sm font-medium text-purple-950 mb-4">Be the first to know about our latest promotions</h3>
+              <h3 className="text-sm font-medium text-purple-950 dark:text-purple-100 mb-4 transition-colors">Be the first to know about our latest promotions</h3>
               <div className="relative">
                 <input 
                   type="email" 
                   placeholder="Email" 
-                  className="w-full bg-transparent border border-purple-300 text-purple-900 p-3 pr-12 focus:outline-none focus:border-purple-500 transition placeholder:text-purple-500/70"
+                  className="w-full bg-transparent border border-purple-300 dark:border-purple-700/50 text-purple-900 dark:text-purple-100 p-3 pr-12 focus:outline-none focus:border-purple-500 dark:focus:border-purple-400 transition placeholder:text-purple-500/70 dark:placeholder:text-purple-400/50"
                 />
-                <button className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-500 hover:text-purple-950 transition">
+                <button className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-500 dark:text-purple-400 hover:text-purple-950 dark:hover:text-purple-100 transition">
                    <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
             
-            <div className="flex items-center gap-6 text-purple-950">
-              <Link href="#" className="hover:text-purple-600 transition" title="LinkedIn"><Globe className="w-5 h-5" /></Link>
-              <Link href="#" className="hover:text-purple-600 transition" title="Facebook"><Mail className="w-5 h-5" /></Link>
-              <Link href="#" className="hover:text-purple-600 transition" title="Instagram"><Camera className="w-5 h-5" /></Link>
+            <div className="flex items-center gap-6 text-purple-950 dark:text-purple-300 transition-colors">
+              <Link href="#" className="hover:text-purple-600 dark:hover:text-purple-100 transition" title="LinkedIn"><Globe className="w-5 h-5" /></Link>
+              <Link href="#" className="hover:text-purple-600 dark:hover:text-purple-100 transition" title="Facebook"><Mail className="w-5 h-5" /></Link>
+              <Link href="#" className="hover:text-purple-600 dark:hover:text-purple-100 transition" title="Instagram"><Camera className="w-5 h-5" /></Link>
             </div>
           </div>
 
           {/* Copyright */}
-          <div className="text-center border-t border-purple-200/50 pt-8">
-            <p className="text-xs text-purple-500 font-medium">© {new Date().getFullYear()}, Errand</p>
+          <div className="text-center border-t border-purple-200/50 dark:border-slate-800 pt-8 transition-colors">
+            <p className="text-xs text-purple-500 dark:text-purple-400 font-medium">© {new Date().getFullYear()}, Errand</p>
           </div>
 
         </div>
@@ -69,21 +69,21 @@ export default function Footer() {
 
       {/* Modal Overlay */}
       {activeModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
-              <h3 className="font-bold text-errand-obsidian text-lg">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-900/80 backdrop-blur-sm transition-colors">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative animate-in fade-in zoom-in-95 duration-200 border-slate-100 dark:border-slate-800 border">
+            <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+              <h3 className="font-bold text-errand-obsidian dark:text-white text-lg">
                 {activeModal === 'about' ? 'About Errand' : 'How It Works & Policy'}
               </h3>
               <button 
                 onClick={() => setActiveModal(null)}
-                className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition"
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             
-            <div className="p-6 text-slate-600 text-sm leading-relaxed">
+            <div className="p-6 text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
               {activeModal === 'about' && (
                 <p>
                   Errand saves you time from going to the market. Let our trusted shoppers handle the heavy lifting, hand-picking the freshest produce and delivering it right to your doorstep with speed and reliability.
@@ -96,10 +96,10 @@ export default function Footer() {
               )}
             </div>
             
-            <div className="p-4 border-t border-slate-100 flex justify-end">
+            <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
               <button 
                 onClick={() => setActiveModal(null)}
-                className="px-4 py-2 bg-slate-900 text-white font-bold text-sm rounded-xl hover:bg-slate-800 transition"
+                className="px-4 py-2 bg-slate-900 dark:bg-slate-700 text-white font-bold text-sm rounded-xl hover:bg-slate-800 dark:hover:bg-slate-600 transition"
               >
                 Got it
               </button>
