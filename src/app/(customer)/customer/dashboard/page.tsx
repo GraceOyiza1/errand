@@ -81,21 +81,44 @@ const DIRECT_SHOP_MARKET: Market = {
 };
 
 const DIRECT_PRODUCTS = [
-  { id: "dp1", name: "Fresh Tomatoes", estimatedPrice: 30, unit: "bucket", imageUrl: "/images/tomatoes_493x.webp" },
-  { id: "dp2", name: "Red Onions", estimatedPrice: 25, unit: "basket", imageUrl: "/images/onionsx.webp" },
-  { id: "dp3", name: "Fresh Cabbage", estimatedPrice: 20, unit: "head", imageUrl: "/images/cabbage_360x.webp" },
-  { id: "dp4", name: "Green Bell Pepper", estimatedPrice: 45, unit: "basket", imageUrl: "/images/greenbellpepper_360x.webp" },
-  { id: "dp5", name: "Eggs", estimatedPrice: 40, unit: "crate", imageUrl: "/images/Egg.jpg" },
-  { id: "dp6", name: "Carrots", estimatedPrice: 30, unit: "bunch", imageUrl: "/images/carrot.jpg" },
-  { id: "dp7", name: "Fresh Cucumber", estimatedPrice: 15, unit: "bunch", imageUrl: "/images/fresh cucumber.jpg" },
-  { id: "dp8", name: "Ginger", estimatedPrice: 25, unit: "basket", imageUrl: "/images/ginger.jpg" },
-  { id: "dp9", name: "Kale", estimatedPrice: 20, unit: "bunch", imageUrl: "/images/kale.jpg" },
-  { id: "dp10", name: "Pears", estimatedPrice: 35, unit: "basket", imageUrl: "/images/pear.jpg" },
-  { id: "dp11", name: "Pineapple", estimatedPrice: 15, unit: "each", imageUrl: "/images/pineapple.jpg" },
-  { id: "dp12", name: "Potatoes", estimatedPrice: 50, unit: "bucket", imageUrl: "/images/potato.jpg" },
-  { id: "dp13", name: "Red Pepper", estimatedPrice: 45, unit: "basket", imageUrl: "/images/red pepper.jpg" },
-  { id: "dp14", name: "Sweet Strawberry", estimatedPrice: 60, unit: "punnet", imageUrl: "/images/sweet strawberry.jpg" },
+  { id: "dp1", name: "Fresh Tomatoes", estimatedPrice: 30, unit: "bucket", imageUrl: "/images/tomatoes_493x.webp", category: "Fruits & Vegetables" },
+  { id: "dp2", name: "Red Onions", estimatedPrice: 25, unit: "basket", imageUrl: "/images/onionsx.webp", category: "Fruits & Vegetables" },
+  { id: "dp3", name: "Fresh Cabbage", estimatedPrice: 20, unit: "head", imageUrl: "/images/cabbage_360x.webp", category: "Fruits & Vegetables" },
+  { id: "dp4", name: "Green Bell Pepper", estimatedPrice: 45, unit: "basket", imageUrl: "/images/greenbellpepper_360x.webp", category: "Fruits & Vegetables" },
+  { id: "dp5", name: "Eggs", estimatedPrice: 40, unit: "crate", imageUrl: "/images/Egg.jpg", category: "Meats & Chicken" },
+  { id: "dp6", name: "Carrots", estimatedPrice: 30, unit: "bunch", imageUrl: "/images/carrot.jpg", category: "Fruits & Vegetables" },
+  { id: "dp7", name: "Fresh Cucumber", estimatedPrice: 15, unit: "bunch", imageUrl: "/images/fresh cucumber.jpg", category: "Fruits & Vegetables" },
+  { id: "dp8", name: "Ginger", estimatedPrice: 25, unit: "basket", imageUrl: "/images/ginger.jpg", category: "Fruits & Vegetables" },
+  { id: "dp9", name: "Kale", estimatedPrice: 20, unit: "bunch", imageUrl: "/images/kale.jpg", category: "Fruits & Vegetables" },
+  { id: "dp10", name: "Pears", estimatedPrice: 35, unit: "basket", imageUrl: "/images/pear.jpg", category: "Fruits & Vegetables" },
+  { id: "dp11", name: "Pineapple", estimatedPrice: 15, unit: "each", imageUrl: "/images/pineapple.jpg", category: "Fruits & Vegetables" },
+  { id: "dp12", name: "Potatoes", estimatedPrice: 50, unit: "bucket", imageUrl: "/images/potato.jpg", category: "Fruits & Vegetables" },
+  { id: "dp13", name: "Red Pepper", estimatedPrice: 45, unit: "basket", imageUrl: "/images/red pepper.jpg", category: "Fruits & Vegetables" },
+  { id: "dp14", name: "Sweet Strawberry", estimatedPrice: 60, unit: "punnet", imageUrl: "/images/sweet strawberry.jpg", category: "Fruits & Vegetables" },
+  
+  // Grains & Rice
+  { id: "dp15", name: "Cindy Rice (5kg)", estimatedPrice: 120, unit: "bag", imageUrl: "/images/cindy-rice-5kg_360x.webp", category: "Grains & Rice" },
+  { id: "dp16", name: "Abena Rice (5kg)", estimatedPrice: 110, unit: "bag", imageUrl: "/images/abena-rice-5kg_351faf3f-c511-42b4-93a5-79f5181f60b2_360x.webp", category: "Grains & Rice" },
+  { id: "dp17", name: "Jasmine Rice", estimatedPrice: 150, unit: "bag", imageUrl: "/images/Member_s_Mark_Jasmine_Rice_360x.webp", category: "Grains & Rice" },
+  
+  // Alcohol & Wine
+  { id: "dp18", name: "Broadleaf Wine", estimatedPrice: 120, unit: "bottle", imageUrl: "/images/broadleafwine.jpeg", category: "Alcohol & Wine" },
+  { id: "dp19", name: "Chianti Wine", estimatedPrice: 140, unit: "bottle", imageUrl: "/images/chiantiwine.jpeg", category: "Alcohol & Wine" },
+  { id: "dp20", name: "Paros Wine", estimatedPrice: 130, unit: "bottle", imageUrl: "/images/paroswine.jpeg", category: "Alcohol & Wine" },
+  { id: "dp21", name: "Rossie Wine", estimatedPrice: 150, unit: "bottle", imageUrl: "/images/rossiewine.jpeg", category: "Alcohol & Wine" },
+  
+  // Meats & Chicken
+  { id: "dp22", name: "Chicken Drumsticks", estimatedPrice: 85, unit: "pack", imageUrl: "/images/Chicken_Drumsticks_360x.webp", category: "Meats & Chicken" },
+  { id: "dp23", name: "Sadia Chicken Sausages", estimatedPrice: 45, unit: "pack", imageUrl: "/images/Sadia_Chicken_Sausages_360x.webp", category: "Meats & Chicken" },
+  
+  // Canned Foods
+  { id: "dp24", name: "Exeter Corned Beef", estimatedPrice: 50, unit: "tin", imageUrl: "/images/ExeterCornedBeef_360x.webp", category: "Canned Foods" },
+  { id: "dp25", name: "Tasty Tom Tomato Mix", estimatedPrice: 15, unit: "tin", imageUrl: "/images/Tasty_Tom_Tomato_Mix.webp", category: "Canned Foods" },
+  { id: "dp26", name: "Gino Tomato Mix", estimatedPrice: 18, unit: "pouch", imageUrl: "/images/gino_medium_pouch_493x.webp", category: "Canned Foods" },
+  { id: "dp27", name: "Titus Sardines", estimatedPrice: 20, unit: "tin", imageUrl: "/images/titus.jpg", category: "Canned Foods" },
 ];
+
+const DIRECT_CATEGORIES = ["All Categories", "Fruits & Vegetables", "Grains & Rice", "Alcohol & Wine", "Meats & Chicken", "Canned Foods"];
 
 const MARKET_CATALOG: CatalogItem[] = [
   {
@@ -119,6 +142,7 @@ export default function CustomerDashboard() {
   const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
   const [items, setItems] = useState<ShoppingItem[]>([]);
   const [directSearchQuery, setDirectSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     "mobile-money" | "cash"
   >("mobile-money");
@@ -1069,12 +1093,29 @@ export default function CustomerDashboard() {
               ← Back to Markets
             </button>
             <h1 className="text-3xl font-normal tracking-tight text-slate-800">
-              Fruits & Vegetables
+              {selectedCategory === "All Categories" ? "Shop Errand" : selectedCategory}
             </h1>
           </div>
 
+          {/* Categories */}
+          <div className="flex overflow-x-auto pb-2 mb-2 gap-2 scrollbar-hide">
+            {DIRECT_CATEGORIES.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition cursor-pointer ${
+                  selectedCategory === category
+                    ? "bg-errand-leaf text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
           <div className="flex justify-between items-center text-sm text-slate-500 mb-6">
-            <div className="w-1/2 sm:max-w-xs">
+            <div className="w-full sm:max-w-xs">
               <input
                 type="text"
                 placeholder="Filter and search..."
@@ -1083,12 +1124,15 @@ export default function CustomerDashboard() {
                 className="w-full text-sm border-b border-slate-200 py-2 bg-transparent focus:outline-none focus:border-slate-800 placeholder:text-slate-400"
               />
             </div>
-            <span>{DIRECT_PRODUCTS.length} products</span>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pb-6 gap-3 sm:gap-4">
             {(() => {
-              const filteredProducts = DIRECT_PRODUCTS.filter(p => p.name.toLowerCase().includes(directSearchQuery.toLowerCase()));
+              const filteredProducts = DIRECT_PRODUCTS.filter(p => {
+                const matchesSearch = p.name.toLowerCase().includes(directSearchQuery.toLowerCase());
+                const matchesCategory = selectedCategory === "All Categories" || p.category === selectedCategory;
+                return matchesSearch && matchesCategory;
+              });
               
               if (filteredProducts.length === 0) {
                 return (
