@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-errand-obsidian: #131616;
   --color-errand-leaf: #1E4631;
