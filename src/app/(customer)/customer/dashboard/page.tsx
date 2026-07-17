@@ -167,6 +167,42 @@ export default function CustomerDashboard() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
 
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Load state from sessionStorage on mount
+  useEffect(() => {
+    const savedState = sessionStorage.getItem("errand_dashboard_state");
+    if (savedState) {
+      try {
+        const parsed = JSON.parse(savedState);
+        if (parsed.step !== undefined) setStep(parsed.step);
+        if (parsed.selectedMarket) setSelectedMarket(parsed.selectedMarket);
+        if (parsed.items) setItems(parsed.items);
+        if (parsed.customerName) setCustomerName(parsed.customerName);
+        if (parsed.customerPhone) setCustomerPhone(parsed.customerPhone);
+      } catch (e) {
+        console.error("Failed to parse saved state", e);
+      }
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // Save state to sessionStorage whenever it changes
+  useEffect(() => {
+    if (isInitialized) {
+      sessionStorage.setItem(
+        "errand_dashboard_state",
+        JSON.stringify({
+          step,
+          selectedMarket,
+          items,
+          customerName,
+          customerPhone,
+        })
+      );
+    }
+  }, [step, selectedMarket, items, customerName, customerPhone, isInitialized]);
+
   // Toggle between standard catalog or custom open text input
   const [isCustomMode, setIsCustomMode] = useState(false);
 
