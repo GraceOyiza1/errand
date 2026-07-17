@@ -283,7 +283,7 @@ export default function CustomerOrdersPage() {
                                         </p>
                                     </div>
                                     <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${statusBadge[order.status] || 'bg-slate-100 text-slate-600'}`}>
-                                        {order.status.replace('_', ' ')}
+                                        {(order.status || 'pending').replace('_', ' ')}
                                     </span>
                                 </div>
 

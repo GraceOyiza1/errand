@@ -230,7 +230,7 @@ export default function CustomerDashboard() {
     const savedOrderId = window.localStorage.getItem("errand-last-order-id");
     if (!savedOrderId) return;
 
-    const savedPhone2 = window.localStorage.getItem("errand-customer-phone") || "";
+    const savedPhone2 = customerPhone || sessionStorage.getItem('customerPhone') || 'guest';
     const customerId = `customer_${savedPhone2.replace(/\s+/g, "")}`;
 
     const pollOrder = async () => {
@@ -397,9 +397,9 @@ export default function CustomerDashboard() {
   const grandTotal = itemsSubtotal + marketBuffer + deliveryFee;
 
   const paystackConfig = {
-    reference: new Date().getTime().toString() + Math.floor(Math.random() * 1000000000).toString(),
-    email: customerPhone ? `${customerPhone.replace(/\s+/g, "")}@errand.com` : "user@errand.com",
     amount: Math.round(grandTotal * 100), // in Pesewas (Ghanaian cedi)
+    email: customerPhone ? `${customerPhone.replace(/\s+/g, "")}@errand.com` : "user@errand.com",
+    reference: `errand_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_TEST_PUBLIC_KEY || "pk_test_f13bd5c684131636c8030a7b859f15b2cdc85ed2",
     currency: "GHS",
   };
@@ -407,8 +407,8 @@ export default function CustomerDashboard() {
   const processOrder = async () => {
     if (!selectedMarket) return;
 
-    // Derive a stable customerId from the phone number
-    const customerId = `customer_${customerPhone.trim().replace(/\s+/g, "")}`;
+    // Derive a stable customerId
+    const customerId = `customer_${(customerPhone || "").trim().replace(/\s+/g, "") || "guest"}`;
 
     // Persist identity to localStorage so the orders page can look them up
     if (typeof window !== "undefined") {
