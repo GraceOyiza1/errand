@@ -547,26 +547,29 @@ export default function CustomerDashboard() {
 
       {step === 1 && (
         <div className="space-y-4 sm:space-y-6">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-0">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4 lg:gap-0">
             <div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-errand-obsidian">
-                Request a New Errand
-              </h1>
-              <p className="text-slate-500 mt-1 sm:mt-2 text-sm sm:text-base">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-errand-obsidian">
+                  Request a New Errand
+                </h1>
+                <span className="text-slate-400 font-medium text-lg sm:text-xl italic">or</span>
+                <button
+                  onClick={() => {
+                    setSelectedMarket(DIRECT_SHOP_MARKET);
+                    setItems([]);
+                    setStep(3);
+                  }}
+                  className="bg-purple-100 border border-purple-200 shadow-sm text-purple-900 font-extrabold px-5 py-1.5 rounded-xl hover:bg-purple-200 transition cursor-pointer uppercase tracking-wider text-sm sm:text-base w-fit"
+                >
+                  SHOP ERRAND
+                </button>
+              </div>
+              <p className="text-slate-500 mt-2 text-sm sm:text-base">
                 Select the market where our shopper should buy your Groceries.
               </p>
             </div>
-            <div className="flex flex-col items-end gap-2">
-              <button
-                onClick={() => {
-                  setSelectedMarket(DIRECT_SHOP_MARKET);
-                  setItems([]);
-                  setStep(3);
-                }}
-                className="bg-purple-100 border border-purple-200 shadow-sm text-purple-900 font-extrabold px-6 py-2 rounded-xl hover:bg-purple-200 transition cursor-pointer uppercase tracking-wider"
-              >
-                SHOP ERRAND
-              </button>
+            <div className="flex flex-col items-end gap-2 pt-2">
               <button
                 onClick={() => setStep(0)}
                 className="text-xs sm:text-sm font-medium text-slate-500 hover:text-errand-leaf cursor-pointer whitespace-nowrap"
