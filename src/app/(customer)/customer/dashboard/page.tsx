@@ -553,16 +553,16 @@ export default function CustomerDashboard() {
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-errand-obsidian">
                   Request a New Errand
                 </h1>
-                <span className="text-slate-400 font-medium text-lg sm:text-xl italic">or</span>
+                <span className="text-slate-400 font-bold text-lg sm:text-xl">OR</span>
                 <button
                   onClick={() => {
                     setSelectedMarket(DIRECT_SHOP_MARKET);
                     setItems([]);
                     setStep(3);
                   }}
-                  className="bg-purple-100 border border-purple-200 shadow-sm text-purple-900 font-extrabold px-5 py-1.5 rounded-xl hover:bg-purple-200 transition cursor-pointer uppercase tracking-wider text-sm sm:text-base w-fit"
+                  className="bg-purple-100 border border-purple-200 shadow-sm text-purple-900 font-bold px-5 py-1.5 rounded-xl hover:bg-purple-200 transition cursor-pointer text-sm sm:text-base w-fit"
                 >
-                  SHOP ERRAND
+                  Shop errand
                 </button>
               </div>
               <p className="text-slate-500 mt-2 text-sm sm:text-base">
