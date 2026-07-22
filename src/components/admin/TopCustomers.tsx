@@ -54,9 +54,16 @@ export default function TopCustomers() {
                             </div>
                             <div>
                                 <div className="font-bold text-slate-900 dark:text-white">
-                                    {customer.name}
+                                    {(() => {
+                                        const rawId = customer.name || '';
+                                        let phoneStr = rawId.replace('customer_', '');
+                                        if (phoneStr.length >= 10 && !isNaN(Number(phoneStr))) {
+                                            return phoneStr.substring(0, 4) + '****' + phoneStr.substring(phoneStr.length - 3);
+                                        }
+                                        return rawId.length > 8 ? rawId.substring(0, 4) + '****' + rawId.substring(rawId.length - 3) : rawId;
+                                    })()}
                                 </div>
-                                <div className="text-xs text-slate-500 mt-0.5">ID: {customer.id}</div>
+                                <div className="text-xs text-slate-500 mt-0.5">ID: {customer.id.substring(0, 8)}...</div>
                             </div>
                         </div>
                         <div className="text-right">
