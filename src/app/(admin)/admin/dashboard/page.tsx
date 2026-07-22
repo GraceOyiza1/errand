@@ -1,24 +1,37 @@
+import React from 'react';
+import DashboardStats from '@/components/admin/DashboardStats';
+import RevenueChart from '@/components/admin/RevenueChart';
+import ActiveShoppers from '@/components/admin/ActiveShoppers';
+import TopCustomers from '@/components/admin/TopCustomers';
+
 export default function AdminDashboardPage() {
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
             <div>
-                <h1 className="text-3xl font-bold text-slate-900">Admin Dashboard</h1>
-                <p className="mt-1 text-sm text-slate-500">Overview of platform activity and operations.</p>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Admin Dashboard</h1>
+                <p className="mt-2 text-slate-500 dark:text-slate-400">
+                    Overview of platform activity, revenue, and active workers.
+                </p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                    <p className="text-sm text-slate-500">Total Orders</p>
-                    <h2 className="mt-2 text-3xl font-semibold">128</h2>
+            {/* Premium Metric Cards */}
+            <DashboardStats />
+
+            <div className="grid gap-8 lg:grid-cols-3">
+                {/* Charts Area */}
+                <div className="lg:col-span-2">
+                    <RevenueChart />
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                    <p className="text-sm text-slate-500">Active Shoppers</p>
-                    <h2 className="mt-2 text-3xl font-semibold">24</h2>
+                
+                {/* Top Customers (For Annual Gifts) */}
+                <div className="lg:col-span-1">
+                    <TopCustomers />
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                    <p className="text-sm text-slate-500">Pending Issues</p>
-                    <h2 className="mt-2 text-3xl font-semibold">7</h2>
-                </div>
+            </div>
+
+            <div className="grid gap-8">
+                {/* Active Workers / Shoppers */}
+                <ActiveShoppers />
             </div>
         </div>
     );
