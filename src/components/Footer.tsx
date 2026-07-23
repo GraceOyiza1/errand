@@ -5,7 +5,17 @@ import { Globe, Camera, Mail, X, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Footer() {
-  const [activeModal, setActiveModal] = useState<'about' | 'policy' | null>(null);
+  const [activeModal, setActiveModal] = useState<'about' | 'policy' | 'privacy' | 'hacks' | 'delivery' | 'faq' | null>(null);
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = () => {
+    if (email.trim()) {
+      setSubscribed(true);
+      setEmail('');
+      setTimeout(() => setSubscribed(false), 4000);
+    }
+  };
 
   return (
     <>
@@ -19,7 +29,7 @@ export default function Footer() {
               <ul className="space-y-4 text-sm text-purple-800 dark:text-purple-300 transition-colors">
                 <li><button onClick={() => setActiveModal('about')} className="hover:text-purple-600 dark:hover:text-purple-400 transition text-left">Who are we?</button></li>
                 <li><button onClick={() => setActiveModal('policy')} className="hover:text-purple-600 dark:hover:text-purple-400 transition text-left">Conditions</button></li>
-                <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">Privacy</Link></li>
+                <li><button onClick={() => setActiveModal('privacy')} className="hover:text-purple-600 dark:hover:text-purple-400 transition text-left">Privacy</button></li>
                 <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">Refund</Link></li>
               </ul>
             </div>
@@ -28,9 +38,9 @@ export default function Footer() {
             <div>
               <h3 className="font-semibold text-purple-950 dark:text-purple-100 mb-6 transition-colors">Connect</h3>
               <ul className="space-y-4 text-sm text-purple-800 dark:text-purple-300 transition-colors">
-                <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">Shopping Hacks</Link></li>
-                <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">Delivery areas</Link></li>
-                <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">FAQ</Link></li>
+                <li><button onClick={() => setActiveModal('hacks')} className="hover:text-purple-600 dark:hover:text-purple-400 transition text-left">Shopping Hacks</button></li>
+                <li><button onClick={() => setActiveModal('delivery')} className="hover:text-purple-600 dark:hover:text-purple-400 transition text-left">Delivery areas</button></li>
+                <li><button onClick={() => setActiveModal('faq')} className="hover:text-purple-600 dark:hover:text-purple-400 transition text-left">FAQ</button></li>
                 <li><Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition block">Customer support</Link></li>
               </ul>
             </div>
@@ -43,13 +53,24 @@ export default function Footer() {
               <div className="relative">
                 <input 
                   type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
                   placeholder="Email" 
                   className="w-full bg-transparent border border-purple-300 dark:border-purple-700/50 text-purple-900 dark:text-purple-100 p-3 pr-12 focus:outline-none focus:border-purple-500 dark:focus:border-purple-400 transition placeholder:text-purple-500/70 dark:placeholder:text-purple-400/50"
                 />
-                <button className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-500 dark:text-purple-400 hover:text-purple-950 dark:hover:text-purple-100 transition">
+                <button 
+                  onClick={handleSubscribe}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-500 dark:text-purple-400 hover:text-purple-950 dark:hover:text-purple-100 transition"
+                >
                    <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
+              {subscribed && (
+                <p className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold mt-2 animate-in fade-in">
+                  Thanks for subscribing!
+                </p>
+              )}
             </div>
             
             <div className="flex items-center gap-6 text-purple-950 dark:text-purple-300 transition-colors">
@@ -73,7 +94,12 @@ export default function Footer() {
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative animate-in fade-in zoom-in-95 duration-200 border-slate-100 dark:border-slate-800 border">
             <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
               <h3 className="font-bold text-errand-obsidian dark:text-white text-lg">
-                {activeModal === 'about' ? 'About Errand' : 'How It Works & Policy'}
+                {activeModal === 'about' && 'About Errand'}
+                {activeModal === 'policy' && 'How It Works & Policy'}
+                {activeModal === 'privacy' && 'Privacy Policy'}
+                {activeModal === 'hacks' && 'Shopping Hacks'}
+                {activeModal === 'delivery' && 'Delivery Areas'}
+                {activeModal === 'faq' && 'Frequently Asked Questions'}
               </h3>
               <button 
                 onClick={() => setActiveModal(null)}
@@ -93,6 +119,28 @@ export default function Footer() {
                 <p>
                   Our policy is simple: transparent pricing, guaranteed freshness, and seamless delivery. You select your market, confirm your list, and our shoppers use real-time negotiation and status updates to keep you informed every step of the way.
                 </p>
+              )}
+              {activeModal === 'privacy' && (
+                <p>
+                  At Errand, your privacy is our priority. We only collect the necessary information—like your delivery location, phone number, and grocery preferences—to ensure our shoppers can deliver your items accurately. We never sell your personal data to third parties.
+                </p>
+              )}
+              {activeModal === 'hacks' && (
+                <p>
+                  <strong>Pro Tip:</strong> Need an item that isn't listed in our catalog? Use the "Custom Request" feature when making your list! Type exactly what you want (e.g., "Smoked Herrings", "Dawadawa"). Our shoppers are experts at finding local market ingredients.
+                </p>
+              )}
+              {activeModal === 'delivery' && (
+                <p>
+                  Errand currently operates in major markets across Accra, including Madina Market, Makola Market, Kaneshie Market, and Agbogbloshie. Our shoppers can deliver to residential neighborhoods within a 15km radius of these primary hubs.
+                </p>
+              )}
+              {activeModal === 'faq' && (
+                <div className="space-y-3">
+                  <p><strong>How fast is delivery?</strong> Express Direct Shop orders are typically delivered within 60-90 minutes depending on traffic.</p>
+                  <p><strong>Can I edit my order?</strong> Yes! If your shopper hasn't started buying, you can cancel or edit your active list from your dashboard.</p>
+                  <p><strong>How do I pay?</strong> We accept Cash on Delivery or Mobile Money / Card payments securely via Paystack.</p>
+                </div>
               )}
             </div>
             

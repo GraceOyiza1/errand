@@ -108,7 +108,7 @@ const DIRECT_PRODUCTS = [
   { id: "dp21", name: "Rossie Wine", estimatedPrice: 150, unit: "bottle", imageUrl: "/images/rossiewine.jpeg", category: "Alcohol & Wine" },
   
   // Meats & Chicken
-  { id: "dp22", name: "Chicken Drumsticks", estimatedPrice: 85, unit: "pack", imageUrl: "/images/Chicken_Drumsticks_360x.webp", category: "Meats & Chicken" },
+  { id: "dp22", name: "Chicken Drumsticks", estimatedPrice: 55, unit: "kilo", imageUrl: "/images/Chicken_Drumsticks_360x.webp", category: "Meats & Chicken" },
   { id: "dp23", name: "Sadia Chicken Sausages", estimatedPrice: 45, unit: "pack", imageUrl: "/images/Sadia_Chicken_Sausages_360x.webp", category: "Meats & Chicken" },
   
   // Canned Foods
@@ -607,32 +607,36 @@ export default function CustomerDashboard() {
 
       {step === 1 && (
         <div className="space-y-4 sm:space-y-6">
-          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4 lg:gap-0">
-            <div>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-errand-obsidian">
-                  Request a New Errand
-                </h1>
-                <span className="text-slate-400 font-bold text-lg sm:text-xl">OR</span>
-                <button
-                  onClick={() => {
-                    setSelectedMarket(DIRECT_SHOP_MARKET);
-                    setItems([]);
-                    setStep(3);
-                  }}
-                  className="bg-purple-100 border border-purple-200 shadow-sm text-purple-900 font-bold px-5 py-1.5 rounded-xl hover:bg-purple-200 transition cursor-pointer text-sm sm:text-base w-fit"
-                >
-                  Shop errand
-                </button>
-              </div>
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-0">
+            <div className="w-full lg:w-1/2">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-errand-obsidian">
+                Request a New Errand
+              </h1>
               <p className="text-slate-500 mt-2 text-sm sm:text-base">
                 Select the market where our shopper should buy your Groceries.
               </p>
             </div>
-            <div className="flex flex-col items-end gap-2 pt-2">
+            
+            <div className="flex justify-center items-center py-1 lg:py-0 lg:w-1/6">
+              <span className="text-slate-400 font-black text-xs sm:text-sm bg-slate-100 px-3 py-1 rounded-full tracking-widest">
+                OR
+              </span>
+            </div>
+
+            <div className="w-full lg:w-1/3 flex flex-col items-start lg:items-end gap-2">
+              <button
+                onClick={() => {
+                  setSelectedMarket(DIRECT_SHOP_MARKET);
+                  setItems([]);
+                  setStep(3);
+                }}
+                className="bg-purple-100 border border-purple-200 shadow-sm text-purple-900 font-bold px-6 py-2.5 rounded-xl hover:bg-purple-200 transition cursor-pointer text-sm sm:text-base w-full lg:w-auto"
+              >
+                Shop errand
+              </button>
               <button
                 onClick={() => setStep(0)}
-                className="text-xs sm:text-sm font-medium text-slate-500 hover:text-errand-leaf cursor-pointer whitespace-nowrap"
+                className="text-xs sm:text-sm font-medium text-slate-500 hover:text-errand-leaf cursor-pointer whitespace-nowrap mt-1"
               >
                 Edit Profile
               </button>
@@ -643,7 +647,11 @@ export default function CustomerDashboard() {
             {ACCRA_MARKETS.map((market) => (
               <div
                 key={market.id}
-                onClick={() => setSelectedMarket(market)}
+                onClick={() => {
+                  setSelectedMarket(market);
+                  // Slight delay so the user sees the green selection ring before transitioning
+                  setTimeout(() => setStep(2), 150);
+                }}
                 className={`overflow-hidden bg-errand-alabaster border rounded-2xl shadow-xs hover:shadow-md transition cursor-pointer ${selectedMarket?.id === market.id
                   ? "ring-2 ring-emerald-600 border-transparent"
                   : "border-slate-200"
@@ -672,17 +680,6 @@ export default function CustomerDashboard() {
               </div>
             ))}
           </div>
-
-          {selectedMarket && (
-            <div className="flex justify-end pt-3 sm:pt-4 border-t border-slate-200">
-              <button
-                className="bg-errand-leaf text-white font-semibold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:bg-errand-leaf transition cursor-pointer"
-                onClick={() => setStep(2)}
-              >
-                Continue to your Shopping List
-              </button>
-            </div>
-          )}
         </div>
       )}
 
@@ -1200,9 +1197,9 @@ export default function CustomerDashboard() {
                     </div>
                     <div className="p-3 flex-1 flex flex-col bg-white">
                       <h3 className="font-medium text-slate-800 text-sm leading-tight mb-1">{product.name}</h3>
-                      <div className="flex items-center gap-2 mb-3">
-                        <p className="text-slate-400 line-through text-xs">GH₵{(product.estimatedPrice * 1.2).toFixed(2)}</p>
-                        <p className="text-slate-800 font-medium text-sm">GH₵{product.estimatedPrice.toFixed(2)}</p>
+                      <div className="flex flex-wrap items-baseline gap-1 mb-2 sm:mb-3">
+                        <p className="text-slate-800 font-bold text-sm">GH₵{product.estimatedPrice.toFixed(2)}</p>
+                        <p className="text-slate-500 text-xs">/ {product.unit}</p>
                       </div>
                       
                       <div className="mt-auto">
